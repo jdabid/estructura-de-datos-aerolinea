@@ -1,0 +1,22 @@
+Una aerolinea lo ha contratado a usted para desarrollar un sistema de reservas de vuelo. Cada vuelo tiene un destino, un origen,
+un costo y aplican unos impuestos dependiendo del destino, por ejemplo San Andres, tiene un impuesto de X porcentaje del valor
+del tiquete en pesos. 
+El programa debe preguntar los impuestos por cada destino.
+
+La aerolinea permite el transporte de mascotas que tambien deben pagar el impuesto.
+
+La aerolina permite a las personas comprar vuelos en promocion, estos vuelos deben tambien pagar un
+impuesto y adicional tienen un descuento del 10% sobre el valor del tiquete.
+
+Los infantes tienen un dulce de cortesia que les da la aerolinea. Los infantes van hasta la edad de 12 anios.
+
+La aerolinea desea conocer:
+
+1. El valor total recaudado por concepto de venta de tiquetes
+2. Cual es el destino preferido de las personas
+3. Cuanto dinero ha recaudado por concepto de transporte de mascotas
+4. Cuanto dinero debe pagar la aerolinea de acuerdo a un destino dado, aqui no se debe calcular el total de impuestos en general
+sino el total de impuestos para un solo destino. Ej: total de impuestos para San Andres. La ciudad destino debe ser un Parametro
+de entrada que solicite el sistema
+5. Cuantos infantes han viajado en la aerolina
+6. El costo total de los dulces brindados a los infantes.
