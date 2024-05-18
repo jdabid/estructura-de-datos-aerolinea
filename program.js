@@ -8,6 +8,7 @@ class Vuelo {
     #costo = 0;
     #mascota = 1;
     #promocion = 0;
+    #infante = 1;
 
     set origen(nuevoOrigen){
         this.#origen = nuevoOrigen;
@@ -51,7 +52,14 @@ class Vuelo {
         return this.#promocion;
     }
 
-    constructor(origen, destino, impuestoDestino, costo, mascota, promocion){
+    set infante(nuevainfante){
+        this.#infante = nuevainfante;
+    }
+    get infante(){
+        return this.#infante;
+    }
+
+    constructor(origen, destino, impuestoDestino, costo, mascota, promocion, infante){
         if(origen == undefined){
             throw new Error('El origen del vuelo es requerido');}
         if(destino == undefined){
@@ -64,6 +72,8 @@ class Vuelo {
             throw new Error('El campo mascota es requerido');}
         if(promocion == undefined){
             throw new Error('El campo promocion es requerido');}
+        if(infante == undefined){
+            throw new Error('El campo infante es requerido');}
 
         this.#origen = origen;
         this.#destino = destino;
@@ -71,6 +81,7 @@ class Vuelo {
         this.#costo = costo;
         this.#mascota = mascota;
         this.#promocion = promocion;
+        this.#infante = infante;
 
     }
 }
@@ -178,6 +189,39 @@ class ListaVuelos {
             
         }
     }
+
+    impuestoInfante(){
+        let impuestoSiInfante = 0;
+        let totalImpuestoInfante = 0;
+        let cantidadInfantes = 0;
+        let dulceCortesia = 50;
+
+        if(this.cabeza == null){
+            console.log(`No hay vuelos para mostrar, no hay nodos en la lista`);
+        }
+        else {
+            let nodoTmp = this.cabeza;
+            let i = 1;
+            while(nodoTmp != null){
+                if(nodoTmp.valor.infante == 1){
+                    cantidadInfantes = +readlineSync.question('Ingrese la cantidad de niños menor a 12 años: ');
+                    nodoTmp.valor.impuestoSiInfante = (cantidadInfantes * dulceCortesia);
+                    console.log(`El impuesto por dulce cortsia es: ${nodoTmp.valor.impuestoSiInfante}`);
+                    impuestoSiInfante += nodoTmp.valor.impuestoSiInfante;
+                }
+                else {
+                    console.log(`El vuelo no tiene promocion`);
+                    totalImpuestoInfante += nodoTmp.valor.costo + nodoTmp.valor.totalImpuestoInfante;
+                }
+
+                nodoTmp = nodoTmp.siguiente;
+                i++;
+            }totalImpuestoInfante += impuestoSiInfante;
+            console.log(`${totalImpuestoInfante}`);
+            console.dir(`**********************************************************`);
+            
+        }
+    }
     
 
     
@@ -215,10 +259,11 @@ while(continuar){
     const impuestoDestino = +readlineSync.question('Ingrese el impuesto del destino: ');
     const costo = +readlineSync.question('Ingrese el costo del vuelo: ');
     const mascota = +readlineSync.question('El vuelo incluye mascota? (s(1)/n(2)): ');
-    const promocion = +readlineSync.question('El vuelo tiene promocion? (s(1)/n(2)): ***************** ');
+    const promocion = +readlineSync.question('El vuelo tiene promocion? (s(1)/n(2)): ');
+    const infante = +readlineSync.question('El vuelo tiene niños menores de 12 años? (s(1)/n(2)): ***************** ');
     
 
-    const vuelo = new Vuelo(destino, origen, impuestoDestino, costo, mascota, promocion);
+    const vuelo = new Vuelo(destino, origen, impuestoDestino, costo, mascota, promocion, infante);
     listaVuelos.insertar(vuelo);
 
     const respuesta = readlineSync.question('Desea agregar otro vuelo? (s/n): ');
@@ -231,3 +276,4 @@ listaVuelos.mostrarTodosLosVuelos();
 listaVuelos.impuestoMascota();
 listaVuelos.costoDelVuelo();
 listaVuelos.impuestoPromocion();
+listaVuelos.impuestoInfante();
