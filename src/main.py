@@ -9,7 +9,8 @@ app = FastAPI(title="Flight Reservation System - Week 2")
 
 # Registrar Rutas
 app.include_router(flights.router, prefix="/api/v1")
+app.include_router(bookings.router, prefix="/api/v1")
 
 @app.get("/")
 def health_check():
-    return {"status": "ok", "message": "Gestión de Vuelos Operativa"}
+    return {"status": "ok", "message": "Sistema de Reservas y Gestión de Vuelos Operativo"}
