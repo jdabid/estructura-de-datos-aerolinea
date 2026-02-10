@@ -1,0 +1,37 @@
+name: CI/CD Pipeline
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env: {POSTGRES_PASSWORD: pass, POSTGRES_DB: flights}
+        ports: [5432:5432]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Tests
+        run: |
+          pip install -r requirements.txt pytest httpx
+          pytest tests/
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Build Docker Image
+        run: |
+          docker build -t myregistry/flight-app:latest -f infra/docker/Dockerfile .
+          # docker push myregistry/flight-app:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to K8s via Helm
+        run: |
+          helm upgrade --install flight-system ./infra/helm/flight-app \
+            --set image.tag=latest \
+            --namespace production
