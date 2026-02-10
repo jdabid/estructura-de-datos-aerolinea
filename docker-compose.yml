@@ -1,30 +1,36 @@
 version: '3.8'
 services:
   api:
-    build:
-      context: .
-      dockerfile: infra/docker/Dockerfile
+    build: .
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://user:pass@db:5432/flights
+      - RABBITMQ_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - REDIS_HOST=redis
     depends_on:
       - db
       - redis
+      - rabbitmq
+
+  worker:
+    build: .
+    command: celery -A src.worker.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/flights
+      - RABBITMQ_URL=pyamqp://guest:guest@rabbitmq:5672//
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - rabbitmq
 
   db:
     image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: flights
-    ports:
-      - "5432:5432"
+    # ... (configuración previa)
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    # ... (configuración previa)
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
