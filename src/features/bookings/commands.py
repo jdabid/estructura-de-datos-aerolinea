@@ -1,31 +1,26 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from src.features.flights.models import Flight
+from src.worker.tasks import process_booking_event
+import json
 
 
 def create_booking(db: Session, booking: schemas.BookingCreate):
-    # 1. Obtener información del vuelo y destino
     flight = db.query(Flight).filter(Flight.id == booking.flight_id).first()
     if not flight:
         raise ValueError("El vuelo seleccionado no existe.")
 
     destination = flight.destination
 
-    # 2. Validación de Mascotas
     if booking.has_pet and not destination.allows_pets:
         raise ValueError(f"El destino {destination.name} no acepta mascotas.")
 
-    # 3. Cálculo de Precio con Reglas de Negocio
     price = flight.base_price
-
-    # Aplicar 10% de descuento si es promoción
     if destination.is_promotion:
         price = price * 0.90
 
-    # Sumar impuestos del destino
     total_final = price + destination.tax_amount
 
-    # 4. Persistencia
     db_booking = models.Booking(
         passenger_name=booking.passenger_name,
         passenger_age=booking.passenger_age,
@@ -38,5 +33,15 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
     db.commit()
     db.refresh(db_booking)
 
-    # Nota: En la Semana 4 integraremos aquí el disparo del evento para los dulces de infantes.
+    # --- SEMANA 4: DISPARO DE EVENTO ASÍNCRONO ---
+    payload = {
+        "id": db_booking.id,
+        "passenger_name": db_booking.passenger_name,
+        "passenger_age": db_booking.passenger_age,
+        "total_price": db_booking.total_price,
+        "destination_name": destination.name
+    }
+    process_booking_event.delay(json.dumps(payload))
+    # ---------------------------------------------
+
     return db_booking
