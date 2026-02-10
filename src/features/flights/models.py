@@ -8,7 +8,8 @@ class Destination(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     tax_amount = Column(Float, default=0.0)
-    is_promotion = Column(Boolean, default=False)  # Para el descuento del 10%
+    is_promotion = Column(Boolean, default=False) # Para el descuento del 10%
+    allows_pets = Column(Boolean, default=True)  # Nuevo campo para validación
 
     flights = relationship("Flight", back_populates="destination")
 
