@@ -1,0 +1,9 @@
+/LEARNING
+
+.idea
+
+program.js
+program-copy.js
+node_modules/
+package.json
+package-lock.json
