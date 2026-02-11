@@ -1,14 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from src.features.ai.agent import get_ai_agent
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI Agent"])
+
 
 class ChatRequest(BaseModel):
     message: str
 
+
 class PriceSuggestionRequest(BaseModel):
     destination_name: str
+
 
 @router.post("/chat")
 async def chat_with_agent(request: ChatRequest):
@@ -17,8 +23,10 @@ async def chat_with_agent(request: ChatRequest):
     try:
         response = agent.run(request.message)
         return {"response": response}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        logger.exception("AI chat error")
+        raise HTTPException(status_code=500, detail="Error procesando solicitud de IA")
+
 
 @router.post("/suggest-price")
 async def suggest_price(request: PriceSuggestionRequest):
@@ -31,5 +39,6 @@ async def suggest_price(request: PriceSuggestionRequest):
     try:
         response = agent.run(prompt)
         return {"suggestion": response}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        logger.exception("AI suggest-price error")
+        raise HTTPException(status_code=500, detail="Error procesando sugerencia de precio")

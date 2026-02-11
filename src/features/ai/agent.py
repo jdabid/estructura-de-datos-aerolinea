@@ -2,13 +2,19 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import initialize_agent, AgentType
 from .tools import get_flight_market_data, get_demand_stats
 import os
+import functools
 
 
+@functools.lru_cache(maxsize=1)
 def get_ai_agent():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY environment variable is not set")
+
     llm = ChatOpenAI(
         model="gpt-3.5-turbo",
         temperature=0,
-        openai_api_key=os.getenv("OPENAI_API_KEY")
+        openai_api_key=api_key,
     )
 
     tools = [get_flight_market_data, get_demand_stats]
@@ -17,7 +23,7 @@ def get_ai_agent():
         tools,
         llm,
         agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=True
+        verbose=False,
     )
 
     return agent
