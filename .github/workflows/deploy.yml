@@ -1,72 +1,80 @@
-name: CI/CD Pipeline
-on: [push]
+  name: CI/CD Pipeline
+  on:
+    push:
+      branches: [master]
+    pull_request:
+      branches: [master]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: pass
-          POSTGRES_DB: flights
-          POSTGRES_USER: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      services:
+        postgres:
+          image: postgres:15
+          env:
+            POSTGRES_PASSWORD: pass
+            POSTGRES_DB: flights
+            POSTGRES_USER: user
+          ports:
+            - 5432:5432
+          options: >-
+            --health-cmd="pg_isready -U user"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=5
 
-    steps:
-      - uses: actions/checkout@v3
+      steps:
+        - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.11'
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt pytest httpx
+        - name: Install Dependencies
+          run: pip install -r requirements.txt
 
-      - name: Run Tests
-        env:
-          DATABASE_URL: postgresql://postgres:pass@localhost:5432/flights
-          ENVIRONMENT: testing
-        run: pytest tests/ -v --tb=short
+        - name: Run Tests
+          env:
+            DATABASE_URL: postgresql://user:pass@localhost:5432/flights
+            REDIS_HOST: localhost
+            RABBITMQ_URL: ""
+            ENVIRONMENT: testing
+          run: pytest tests/ -v --tb=short
 
-  build-and-push:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v3
+    build-and-push:
+      needs: test
+      runs-on: ubuntu-latest
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      steps:
+        - uses: actions/checkout@v4
 
-      - name: Login to Registry
-        uses: docker/login-action@v2
-        with:
-          registry: myregistry
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+        - name: Login to Registry
+          uses: docker/login-action@v3
+          with:
+            registry: ${{ secrets.REGISTRY_URL }}
+            username: ${{ secrets.REGISTRY_USER }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t myregistry/flight-app:${{ github.sha }} \
-            -f infra/docker/Dockerfile .
-          docker push myregistry/flight-app:${{ github.sha }}
+        - name: Build and Push Docker Image
+          run: |
+            docker build -t ${{ secrets.REGISTRY_URL }}/flight-app:${{ github.sha }} \
+              -f infra/docker/Dockerfile .
+            docker push ${{ secrets.REGISTRY_URL }}/flight-app:${{ github.sha }}
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    deploy:
+      needs: build-and-push
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
 
-      - name: Set up Kubeconfig
-        run: echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+        - name: Set up Kubeconfig
+          run: |
+            mkdir -p $HOME/.kube
+            echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
 
-      - name: Deploy with Helm
-        run: |
-          helm upgrade --install flight-system ./infra/helm/flight-app \
-            --set image.tag=${{ github.sha }} \
-            --namespace production
+        - name: Deploy with Helm
+          run: |
+            helm upgrade --install flight-system ./infra/helm/flight-app \
+              --set image.tag=${{ github.sha }} \
+              --namespace production

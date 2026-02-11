@@ -3,6 +3,9 @@ from . import models, schemas
 from src.features.flights.models import Flight
 from src.worker.tasks import process_booking_event
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def create_booking(db: Session, booking: schemas.BookingCreate):
@@ -11,13 +14,12 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
         raise ValueError("El vuelo seleccionado no existe.")
 
     destination = flight.destination
-
     if booking.has_pet and not destination.allows_pets:
         raise ValueError(f"El destino {destination.name} no acepta mascotas.")
 
     price = flight.base_price
     if destination.is_promotion:
-        price = price * 0.90
+        price *= 0.90
 
     total_final = price + destination.tax_amount
 
@@ -26,22 +28,25 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
         passenger_age=booking.passenger_age,
         has_pet=booking.has_pet,
         flight_id=booking.flight_id,
-        total_price=total_final
+        total_price=total_final,
     )
 
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
 
-    # --- SEMANA 4: DISPARO DE EVENTO ASÍNCRONO ---
     payload = {
         "id": db_booking.id,
         "passenger_name": db_booking.passenger_name,
         "passenger_age": db_booking.passenger_age,
-        "total_price": db_booking.total_price,
-        "destination_name": destination.name
+        "has_pet": db_booking.has_pet,
+        "total_price": float(db_booking.total_price),
+        "destination_name": destination.name,
     }
-    process_booking_event.delay(json.dumps(payload))
-    # ---------------------------------------------
+
+    try:
+        process_booking_event.delay(json.dumps(payload))
+    except Exception:
+        logger.exception("Failed to dispatch booking event for booking %s", db_booking.id)
 
     return db_booking
