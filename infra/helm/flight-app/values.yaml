@@ -31,45 +31,12 @@ env:
 secrets:
   GROQ_API_KEY: ""
 
-postgresql:
-  image: postgres:15-alpine
-  auth:
-    username: user
-    password: pass
-    database: flights
-  port: 5432
-  persistence:
-    enabled: true
-  healthcheck:
-    enabled: true
-
-redis:
-  image: redis:7-alpine
-  port: 6379
-  healthcheck:
-    enabled: true
-
-rabbitmq:
-  image: rabbitmq:3-management-alpine
-  auth:
-    username: admin
-    password: admin123
-  ports:
-    amqp: 5672
-    management: 15672
-  healthcheck:
-    enabled: true
-
 worker:
   enabled: true
   command: "celery -A src.worker.celery_app worker --loglevel=info"
 
 healthcheck:
   path: /
-  interval: 30s
-  timeout: 5s
-  startPeriod: 10s
-  retries: 3
 
 prometheus:
   scrape: true
