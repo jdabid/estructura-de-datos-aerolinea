@@ -9,6 +9,7 @@ celery_app = Celery(
     "worker",
     broker=broker_url,
     backend=f"redis://{redis_host}:{redis_port}/0",
+    include=["src.worker.tasks"],
 )
 
 celery_app.conf.update(

@@ -1,29 +1,16 @@
-from langchain_openai import ChatOpenAI
-from langchain.agents import initialize_agent, AgentType
-from .tools import get_flight_market_data, get_demand_stats
+from langchain_groq import ChatGroq
 import os
 import functools
 
 
 @functools.lru_cache(maxsize=1)
 def get_ai_agent():
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY environment variable is not set")
+        raise RuntimeError("GROQ_API_KEY environment variable is not set")
 
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
+    return ChatGroq(
+        model="llama-3.3-70b-versatile",
         temperature=0,
-        openai_api_key=api_key,
+        groq_api_key=api_key,
     )
-
-    tools = [get_flight_market_data, get_demand_stats]
-
-    agent = initialize_agent(
-        tools,
-        llm,
-        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=False,
-    )
-
-    return agent
