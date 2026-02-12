@@ -1,75 +1,81 @@
-  version: '3.8'
-  services:
-    api:
-      build:
-        context: .
-        dockerfile: infra/docker/Dockerfile
-      volumes:
-        - .:/app
-      working_dir: /app
-      ports:
-        - "8000:8000"
-      environment:
-        - DATABASE_URL=postgresql://user:pass@db:5432/flights
-        - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
-        - REDIS_HOST=redis
-      depends_on:
-        db:
-          condition: service_healthy
-        redis:
-          condition: service_healthy
-        rabbitmq:
-          condition: service_healthy
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/flights
+      - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
+      - REDIS_HOST=redis
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-    worker:
-      build:
-        context: .
-        dockerfile: infra/docker/Dockerfile
-      command: celery -A src.worker.celery_app worker --loglevel=info
-      environment:
-        - DATABASE_URL=postgresql://user:pass@db:5432/flights
-        - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
-        - REDIS_HOST=redis
-      depends_on:
-        redis:
-          condition: service_healthy
-        rabbitmq:
-          condition: service_healthy
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    command: celery -A src.worker.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/flights
+      - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
+      - REDIS_HOST=redis
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-    db:
-      image: postgres:15-alpine
-      environment:
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: pass
-        POSTGRES_DB: flights
-      ports:
-        - "5432:5432"
-      healthcheck:
-        test: pg_isready -U user -d flights
-        interval: 10s
-        timeout: 5s
-        retries: 5
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: flights
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U user -d flights
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    redis:
-      image: redis:7-alpine
-      ports:
-        - "6379:6379"
-      healthcheck:
-        test: redis-cli ping
-        interval: 10s
-        timeout: 5s
-        retries: 5
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    rabbitmq:
-      image: rabbitmq:3-management-alpine
-      ports:
-        - "5672:5672"
-        - "15672:15672"
-      environment:
-        RABBITMQ_DEFAULT_USER: admin
-        RABBITMQ_DEFAULT_PASS: admin123
-      healthcheck:
-        test: rabbitmq-diagnostics -q ping
-        interval: 10s
-        timeout: 5s
-        retries: 5
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

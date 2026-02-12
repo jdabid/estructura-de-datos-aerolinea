@@ -8,14 +8,13 @@ node_modules/
 package.json
 package-lock.json
 
-  __pycache__/
-  *.pyc
-  *.pyo
-  .DS_Store
-  .env
-  node_modules/
-  *.egg-info/
-  dist/
-  build/
-  .pytest_cache/
-  .mypy_cache/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/

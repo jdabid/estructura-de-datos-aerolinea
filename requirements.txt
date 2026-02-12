@@ -1,7 +1,7 @@
 # API
-fastapi==0.109.0
+fastapi==0.115.0
 uvicorn==0.27.0
-pydantic==2.5.3
+pydantic>=2.7.4
 
 # Database
 sqlalchemy==2.0.25
@@ -14,9 +14,8 @@ redis==5.0.1
 celery==5.3.6
 
 # AI Agent
-langchain==0.1.0
-langchain-openai==0.0.2
-openai==1.6.1
+langchain>=0.3.0
+langchain-groq>=0.2.0
 
 # Testing
 pytest==8.0.0
