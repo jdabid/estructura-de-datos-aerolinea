@@ -38,9 +38,9 @@ sys.modules["src.worker.tasks"] = _mock_tasks
 import pytest  # noqa: E402
 
 # Now import models - they will use our Base instead of the real one.
-# Booking model must also be imported because Flight has a relationship to it.
 import src.features.flights.models  # noqa: E402, F401
 import src.features.bookings.models  # noqa: E402, F401
+import src.features.auth.models  # noqa: E402, F401
 
 
 @pytest.fixture
