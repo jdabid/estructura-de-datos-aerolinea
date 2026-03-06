@@ -71,3 +71,11 @@ EOF
    git pull origin master
    ```
    - No: dejar el PR abierto para review
+
+8. **OBLIGATORIO** — Actualizar sprint tracker (ver `update-sprint-tracker.md`)
+
+9. Si el merge falla por conflictos (branches paralelas):
+   - Usar skill `resolve-parallel-conflicts.md`
+
+10. Si la eliminacion de branch falla por worktree:
+    - Usar skill `cleanup-worktrees.md`
