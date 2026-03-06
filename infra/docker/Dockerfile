@@ -1,7 +1,7 @@
 # Stage 1: Builder
 FROM python:3.11-slim as builder
 WORKDIR /app
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
     && pip install --no-cache-dir --prefix=/install -r requirements.txt
 
@@ -15,7 +15,7 @@ RUN addgroup --system appgroup && adduser --system --group appuser \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /install /usr/local
-COPY ./src ./src
+COPY backend/src ./src
 
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1

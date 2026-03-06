@@ -1,20 +1,29 @@
-/LEARNING
-
-.idea
-
-program.js
-program-copy.js
-node_modules/
-package.json
-package-lock.json
-
+# Python
 __pycache__/
 *.pyc
 *.pyo
-.DS_Store
-.env
 *.egg-info/
 dist/
 build/
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Node (frontend future)
+node_modules/
+package-lock.json
+
+# Project specific
+/LEARNING

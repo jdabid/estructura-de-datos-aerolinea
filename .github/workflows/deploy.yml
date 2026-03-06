@@ -32,7 +32,7 @@
             python-version: '3.11'
 
         - name: Install Dependencies
-          run: pip install -r requirements.txt
+          run: pip install -r backend/requirements.txt
 
         - name: Run Tests
           env:
@@ -40,8 +40,8 @@
             REDIS_HOST: localhost
             RABBITMQ_URL: ""
             ENVIRONMENT: testing
-            PYTHONPATH: ${{ github.workspace }}
-          run: pytest tests/ -v --tb=short
+            PYTHONPATH: ${{ github.workspace }}/backend
+          run: pytest backend/tests/ -v --tb=short
 
     build-and-push:
       needs: test
