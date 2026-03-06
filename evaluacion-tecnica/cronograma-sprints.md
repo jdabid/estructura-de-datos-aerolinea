@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 7 |
+| Completadas | 11 |
 | En progreso | 0 |
-| Pendientes | 46 |
+| Pendientes | 42 |
 | Story Points totales | 229 |
-| Story Points completados | 32 |
-| Story Points restantes | 197 |
-| Velocidad actual | 32 SP (Sprint 1 completado) |
-| Sprint actual | Sprint 1 COMPLETADO |
+| Story Points completados | 48 |
+| Story Points restantes | 181 |
+| Velocidad actual | 32 SP (Sprint 1), 16 SP (Sprint 2 parcial) |
+| Sprint actual | Sprint 2 EN PROGRESO (US-08 a US-11 completadas) |
 
 ### Progreso Global
 
 ```
-Completado: [######____________________________________] 14%  (32/229 SP)
+Completado: [#########_________________________________] 21%  (48/229 SP)
 ```
 
 ---
@@ -61,23 +61,29 @@ Sprint 1: [######################################] 100%  (32/32 SP)
 
 **Sprint Goal:** Alcanzar >80% de coverage en backend y crear el scaffolding del frontend con auth.
 **Duracion:** Semana 3-4
-**Estado:** NO INICIADO
-**SP Completados:** 0/33
+**Estado:** EN PROGRESO
+**SP Completados:** 16/33
 
 ```
-Sprint 2: [______________________________________] 0%  (0/33 SP)
+Sprint 2: [##################____________________] 48%  (16/33 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
 |----|------------|----|---------|---------|----|-------|
-| US-08 | Tests unitarios para flights commands y queries | 5 | PENDIENTE | — | — | — |
-| US-09 | Tests unitarios para bookings commands y queries | 5 | PENDIENTE | — | — | — |
-| US-10 | Tests para auth y schemas | 3 | PENDIENTE | — | — | — |
-| US-11 | Coverage >80% con reporte en CI | 3 | PENDIENTE | — | — | — |
+| US-08 | Tests unitarios para flights commands y queries | 5 | DONE | `feature/s2-US08-tests-flights` | [#20](https://github.com/jdabid/flight-reservation-system/pull/20) | 2026-03-06 |
+| US-09 | Tests unitarios para bookings commands y queries | 5 | DONE | `feature/s2-US09-tests-bookings` | [#21](https://github.com/jdabid/flight-reservation-system/pull/21) | 2026-03-06 |
+| US-10 | Tests para auth y schemas | 3 | DONE | `feature/s2-US10-tests-auth` | [#22](https://github.com/jdabid/flight-reservation-system/pull/22) | 2026-03-06 |
+| US-11 | Coverage >80% con reporte en CI | 3 | DONE | `feature/s2-US11-coverage-ci` | [#23](https://github.com/jdabid/flight-reservation-system/pull/23) | 2026-03-06 |
 | US-12 | App React con pagina de login | 5 | PENDIENTE | — | — | — |
 | US-13 | Login en frontend y mantener sesion | 5 | PENDIENTE | — | — | — |
 | US-14 | Dashboard con estadisticas generales | 5 | PENDIENTE | — | — | — |
 | US-15 | Agregar bandit al pipeline CI | 2 | PENDIENTE | — | — | — |
+
+### Notas del Sprint 2
+- US-08, US-09, US-10, US-11 completadas en batch 1 (las 4 en paralelo con Agents worktree)
+- US-09 y US-10 requirieron rebase por conflicto en conftest.py (resueltos)
+- 45 tests unitarios nuevos: 20 (flights) + 12 (bookings) + 13 (auth/schemas)
+- pytest-cov configurado con threshold >80% en CI
 
 ---
 
@@ -208,7 +214,9 @@ Restantes
       |
   213 |
       |
-  197 |   *  ← actual (Sprint 1 completado)
+  197 |   *
+      |
+  181 |        *  ← actual (Sprint 2 parcial)
       |
   150 |
       |
@@ -224,7 +232,6 @@ Restantes
       |
     0 |________________________________________________
       S1         S2         S3         S4         S5         S6         S7
-      (16 SP)
 ```
 
 ---
@@ -240,3 +247,7 @@ Restantes
 | 2026-03-06 | US-04 | COMPLETADA | 5 | Agent (worktree isolation), Skill: git-workflow |
 | 2026-03-06 | US-05 | COMPLETADA | 3 | Agent (worktree isolation), Skill: git-workflow |
 | 2026-03-06 | US-07 | COMPLETADA | 5 | Agent (worktree isolation), Skill: new-feature, git-workflow |
+| 2026-03-06 | US-08 | COMPLETADA | 5 | Agent (worktree isolation), pytest |
+| 2026-03-06 | US-09 | COMPLETADA | 5 | Agent (worktree isolation), pytest |
+| 2026-03-06 | US-10 | COMPLETADA | 3 | Agent (worktree isolation), pytest |
+| 2026-03-06 | US-11 | COMPLETADA | 3 | Agent (worktree isolation), pytest-cov |
