@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.v1 import flights, bookings, ai, auth
+from src.api.v1 import flights, bookings, ai, auth, stats
 from src.shared.exceptions import AppException, app_exception_handler
 from src.shared.middleware import RateLimitMiddleware
 
@@ -27,6 +27,7 @@ app.include_router(flights.router, prefix="/api/v1")
 app.include_router(bookings.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(stats.router, prefix="/api/v1")
 
 
 @app.get("/")
