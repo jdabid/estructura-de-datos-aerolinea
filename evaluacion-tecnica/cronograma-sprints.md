@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 11 |
+| Completadas | 15 |
 | En progreso | 0 |
-| Pendientes | 42 |
+| Pendientes | 38 |
 | Story Points totales | 229 |
-| Story Points completados | 48 |
-| Story Points restantes | 181 |
-| Velocidad actual | 32 SP (Sprint 1), 16 SP (Sprint 2 parcial) |
-| Sprint actual | Sprint 2 EN PROGRESO (US-08 a US-11 completadas) |
+| Story Points completados | 65 |
+| Story Points restantes | 164 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2) |
+| Sprint actual | Sprint 2 COMPLETADO |
 
 ### Progreso Global
 
 ```
-Completado: [#########_________________________________] 21%  (48/229 SP)
+Completado: [###########_______________________________] 28%  (65/229 SP)
 ```
 
 ---
@@ -61,11 +61,11 @@ Sprint 1: [######################################] 100%  (32/32 SP)
 
 **Sprint Goal:** Alcanzar >80% de coverage en backend y crear el scaffolding del frontend con auth.
 **Duracion:** Semana 3-4
-**Estado:** EN PROGRESO
-**SP Completados:** 16/33
+**Estado:** COMPLETADO
+**SP Completados:** 33/33
 
 ```
-Sprint 2: [##################____________________] 48%  (16/33 SP)
+Sprint 2: [######################################] 100%  (33/33 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
@@ -74,16 +74,22 @@ Sprint 2: [##################____________________] 48%  (16/33 SP)
 | US-09 | Tests unitarios para bookings commands y queries | 5 | DONE | `feature/s2-US09-tests-bookings` | [#21](https://github.com/jdabid/flight-reservation-system/pull/21) | 2026-03-06 |
 | US-10 | Tests para auth y schemas | 3 | DONE | `feature/s2-US10-tests-auth` | [#22](https://github.com/jdabid/flight-reservation-system/pull/22) | 2026-03-06 |
 | US-11 | Coverage >80% con reporte en CI | 3 | DONE | `feature/s2-US11-coverage-ci` | [#23](https://github.com/jdabid/flight-reservation-system/pull/23) | 2026-03-06 |
-| US-12 | App React con pagina de login | 5 | PENDIENTE | — | — | — |
-| US-13 | Login en frontend y mantener sesion | 5 | PENDIENTE | — | — | — |
-| US-14 | Dashboard con estadisticas generales | 5 | PENDIENTE | — | — | — |
-| US-15 | Agregar bandit al pipeline CI | 2 | PENDIENTE | — | — | — |
+| US-12 | App React con pagina de login | 5 | DONE | `feature/s2-US12-US13-frontend-auth` | [#24](https://github.com/jdabid/flight-reservation-system/pull/24) | 2026-03-06 |
+| US-13 | Login en frontend y mantener sesion | 5 | DONE | `feature/s2-US12-US13-frontend-auth` | [#24](https://github.com/jdabid/flight-reservation-system/pull/24) | 2026-03-06 |
+| US-14 | Dashboard con estadisticas generales | 5 | DONE | `feature/s2-US14-dashboard-stats` | [#26](https://github.com/jdabid/flight-reservation-system/pull/26) | 2026-03-06 |
+| US-15 | Agregar bandit al pipeline CI | 2 | DONE | `feature/s2-US15-bandit-ci` | [#25](https://github.com/jdabid/flight-reservation-system/pull/25) | 2026-03-06 |
 
 ### Notas del Sprint 2
 - US-08, US-09, US-10, US-11 completadas en batch 1 (las 4 en paralelo con Agents worktree)
 - US-09 y US-10 requirieron rebase por conflicto en conftest.py (resueltos)
 - 45 tests unitarios nuevos: 20 (flights) + 12 (bookings) + 13 (auth/schemas)
 - pytest-cov configurado con threshold >80% en CI
+- US-12/US-13 combinadas en un solo PR (frontend scaffolding + auth store acoplados)
+- US-14, US-15 en paralelo con Agents worktree (batch 2)
+- US-14 requirio rebase por conflictos en frontend/ con US-12/13 (resueltos: solo DashboardPage.tsx cambiado)
+- US-15 sobreescribio pyproject.toml (corregido con fix commit post-merge)
+- Frontend: Vite + React + TS + Tailwind CSS v4 + Zustand + Axios
+- Sprint 2 completado: 33/33 SP
 
 ---
 
@@ -216,7 +222,9 @@ Restantes
       |
   197 |   *
       |
-  181 |        *  ← actual (Sprint 2 parcial)
+  181 |
+      |
+  164 |        *  ← actual (Sprint 2 completado)
       |
   150 |
       |
@@ -251,3 +259,7 @@ Restantes
 | 2026-03-06 | US-09 | COMPLETADA | 5 | Agent (worktree isolation), pytest |
 | 2026-03-06 | US-10 | COMPLETADA | 3 | Agent (worktree isolation), pytest |
 | 2026-03-06 | US-11 | COMPLETADA | 3 | Agent (worktree isolation), pytest-cov |
+| 2026-03-06 | US-12 | COMPLETADA | 5 | Agent (worktree isolation), Vite, React, Tailwind |
+| 2026-03-06 | US-13 | COMPLETADA | 5 | Agent (worktree isolation), Zustand, Axios |
+| 2026-03-06 | US-15 | COMPLETADA | 2 | Agent (worktree isolation), bandit |
+| 2026-03-06 | US-14 | COMPLETADA | 5 | Agent (worktree isolation), React, stats API |
