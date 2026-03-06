@@ -25,8 +25,24 @@
         - name: Run mypy
           run: cd backend && mypy src/ --ignore-missing-imports
 
+    security:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.11'
+
+        - name: Install bandit
+          run: pip install bandit
+
+        - name: Run bandit security scan
+          run: bandit -r backend/src/ -ll -ii
+
     test:
-      needs: lint
+      needs: [lint, security]
       runs-on: ubuntu-latest
       services:
         postgres:
