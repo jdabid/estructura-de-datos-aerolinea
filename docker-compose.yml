@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: infra/docker/Dockerfile
     volumes:
-      - .:/app
+      - ./backend:/app
     working_dir: /app
     ports:
       - "8000:8000"
@@ -27,6 +27,9 @@ services:
       context: .
       dockerfile: infra/docker/Dockerfile
     command: celery -A src.worker.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    working_dir: /app
     environment:
       - DATABASE_URL=postgresql://user:pass@db:5432/flights
       - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
