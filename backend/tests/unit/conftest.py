@@ -19,6 +19,22 @@ _mock_db_module.engine = MagicMock()
 _mock_db_module.SessionLocal = MagicMock()
 sys.modules["src.shared.database"] = _mock_db_module
 
+# Mock redis client module
+_mock_redis = type(sys)("src.shared.redis_client")
+_mock_redis.update_stat = MagicMock()
+_mock_redis.log_to_list = MagicMock()
+sys.modules["src.shared.redis_client"] = _mock_redis
+
+# Mock celery app module
+_mock_celery_app = type(sys)("src.worker.celery_app")
+_mock_celery_app.celery_app = MagicMock()
+sys.modules["src.worker.celery_app"] = _mock_celery_app
+
+# Mock worker tasks module
+_mock_tasks = type(sys)("src.worker.tasks")
+_mock_tasks.process_booking_event = MagicMock()
+sys.modules["src.worker.tasks"] = _mock_tasks
+
 import pytest  # noqa: E402
 
 # Now import models - they will use our Base instead of the real one.
