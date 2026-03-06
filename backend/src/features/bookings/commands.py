@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from src.features.flights.models import Flight
+from src.shared.exceptions import NotFoundException, ValidationException
 from src.worker.tasks import process_booking_event
 import json
 import logging
@@ -11,11 +12,11 @@ logger = logging.getLogger(__name__)
 def create_booking(db: Session, booking: schemas.BookingCreate):
     flight = db.query(Flight).filter(Flight.id == booking.flight_id).first()
     if not flight:
-        raise ValueError("El vuelo seleccionado no existe.")
+        raise NotFoundException("El vuelo seleccionado no existe.")
 
     destination = flight.destination
     if booking.has_pet and not destination.allows_pets:
-        raise ValueError(f"El destino {destination.name} no acepta mascotas.")
+        raise ValidationException(f"El destino {destination.name} no acepta mascotas.")
 
     price = flight.base_price
     if destination.is_promotion:
