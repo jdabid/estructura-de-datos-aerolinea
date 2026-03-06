@@ -1,0 +1,242 @@
+# Cronograma de Sprints — Tracking en Tiempo Real
+
+> Este documento se actualiza automaticamente cada vez que se finaliza una User Story.
+> Ultima actualizacion: 2026-03-06
+
+---
+
+## Resumen General
+
+| Metrica | Valor |
+|---------|-------|
+| Total User Stories | 53 |
+| Completadas | 7 |
+| En progreso | 0 |
+| Pendientes | 46 |
+| Story Points totales | 229 |
+| Story Points completados | 32 |
+| Story Points restantes | 197 |
+| Velocidad actual | 32 SP (Sprint 1 completado) |
+| Sprint actual | Sprint 1 COMPLETADO |
+
+### Progreso Global
+
+```
+Completado: [######____________________________________] 14%  (32/229 SP)
+```
+
+---
+
+## Sprint 1 — Fundamentos Backend
+
+**Sprint Goal:** Reestructurar el backend con migraciones, autenticacion y manejo de errores profesional.
+**Duracion:** Semana 1-2
+**Estado:** COMPLETADO
+**SP Completados:** 32/32
+
+```
+Sprint 1: [######################################] 100%  (32/32 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-01 | Reorganizar carpetas del proyecto en `backend/` | 3 | DONE | `feature/s1-US01-reorganizar-carpetas` | [#13](https://github.com/jdabid/flight-reservation-system/pull/13) | 2026-03-06 |
+| US-02 | Migraciones con Alembic | 5 | DONE | `feature/s1-US02-alembic-migraciones` | [#14](https://github.com/jdabid/flight-reservation-system/pull/14) | 2026-03-06 |
+| US-03 | Registro y login con JWT | 8 | DONE | `feature/s1-US03-jwt-auth` | [#15](https://github.com/jdabid/flight-reservation-system/pull/15) | 2026-03-06 |
+| US-04 | Sistema de excepciones centralizado | 5 | DONE | `feature/s1-US04-excepciones-centralizadas` | [#17](https://github.com/jdabid/flight-reservation-system/pull/17) | 2026-03-06 |
+| US-05 | Middleware CORS y rate limiting | 3 | DONE | `feature/s1-US05-cors-rate-limiting` | [#18](https://github.com/jdabid/flight-reservation-system/pull/18) | 2026-03-06 |
+| US-06 | Configurar ruff y mypy | 3 | DONE | `feature/s1-US06-ruff-mypy` | [#16](https://github.com/jdabid/flight-reservation-system/pull/16) | 2026-03-06 |
+| US-07 | Feature stats/ con queries a Redis | 5 | DONE | `feature/s1-US07-stats-feature` | [#19](https://github.com/jdabid/flight-reservation-system/pull/19) | 2026-03-06 |
+
+### Notas del Sprint 1
+- US-01, US-02, US-03 completadas en batch 1 (US-02/03 en paralelo con Agents worktree)
+- US-04, US-05, US-06, US-07 completadas en batch 2 (las 4 en paralelo con Agents worktree)
+- US-03 requirio rebase por conflicto en main.py con US-02 (resuelto)
+- US-05 y US-07 requirieron rebase por conflictos en main.py (resueltos)
+- Sprint 1 completado en un solo dia
+
+---
+
+## Sprint 2 — Tests + Inicio Frontend
+
+**Sprint Goal:** Alcanzar >80% de coverage en backend y crear el scaffolding del frontend con auth.
+**Duracion:** Semana 3-4
+**Estado:** NO INICIADO
+**SP Completados:** 0/33
+
+```
+Sprint 2: [______________________________________] 0%  (0/33 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-08 | Tests unitarios para flights commands y queries | 5 | PENDIENTE | — | — | — |
+| US-09 | Tests unitarios para bookings commands y queries | 5 | PENDIENTE | — | — | — |
+| US-10 | Tests para auth y schemas | 3 | PENDIENTE | — | — | — |
+| US-11 | Coverage >80% con reporte en CI | 3 | PENDIENTE | — | — | — |
+| US-12 | App React con pagina de login | 5 | PENDIENTE | — | — | — |
+| US-13 | Login en frontend y mantener sesion | 5 | PENDIENTE | — | — | — |
+| US-14 | Dashboard con estadisticas generales | 5 | PENDIENTE | — | — | — |
+| US-15 | Agregar bandit al pipeline CI | 2 | PENDIENTE | — | — | — |
+
+---
+
+## Sprint 3 — Frontend Completo
+
+**Sprint Goal:** Completar todas las paginas del frontend con funcionalidad real.
+**Duracion:** Semana 5-6
+**Estado:** NO INICIADO
+**SP Completados:** 0/34
+
+```
+Sprint 3: [______________________________________] 0%  (0/34 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-16 | Lista de destinos y vuelos disponibles | 5 | PENDIENTE | — | — | — |
+| US-17 | Crear destinos y vuelos desde frontend | 5 | PENDIENTE | — | — | — |
+| US-18 | Crear reserva con precio en tiempo real | 8 | PENDIENTE | — | — | — |
+| US-19 | Historial de reservas | 3 | PENDIENTE | — | — | — |
+| US-20 | Graficas de estadisticas | 5 | PENDIENTE | — | — | — |
+| US-21 | Chat con agente IA | 5 | PENDIENTE | — | — | — |
+| US-22 | Dockerfile para frontend con nginx | 3 | PENDIENTE | — | — | — |
+
+---
+
+## Sprint 4 — Docker Profesional + Kubernetes Base
+
+**Sprint Goal:** Contenedorizacion profesional y despliegue base en Kubernetes con Helm.
+**Duracion:** Semana 7-8
+**Estado:** NO INICIADO
+**SP Completados:** 0/32
+
+```
+Sprint 4: [______________________________________] 0%  (0/32 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-23 | Docker Compose con todos los servicios | 5 | PENDIENTE | — | — | — |
+| US-24 | Docker Compose dev con hot-reload | 3 | PENDIENTE | — | — | — |
+| US-25 | Makefile con comandos rapidos | 2 | PENDIENTE | — | — | — |
+| US-26 | Helm Chart con templates | 8 | PENDIENTE | — | — | — |
+| US-27 | HPA para autoescalado | 3 | PENDIENTE | — | — | — |
+| US-28 | Ingress controller con TLS | 5 | PENDIENTE | — | — | — |
+| US-29 | Network policies | 3 | PENDIENTE | — | — | — |
+| US-30 | Resource requests y limits | 3 | PENDIENTE | — | — | — |
+
+---
+
+## Sprint 5 — Kustomize + IA Avanzada
+
+**Sprint Goal:** Configurar ambientes con Kustomize y mejorar el agente de IA con RAG avanzado.
+**Duracion:** Semana 9-10
+**Estado:** NO INICIADO
+**SP Completados:** 0/33
+
+```
+Sprint 5: [______________________________________] 0%  (0/33 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-31 | Kustomize base con manifiestos | 5 | PENDIENTE | — | — | — |
+| US-32 | Overlays para dev, staging, prod | 5 | PENDIENTE | — | — | — |
+| US-33 | Kustomize build valido por ambiente | 3 | PENDIENTE | — | — | — |
+| US-34 | pgvector en PostgreSQL | 5 | PENDIENTE | — | — | — |
+| US-35 | Busqueda semantica en agente IA | 5 | PENDIENTE | — | — | — |
+| US-36 | Prediccion de demanda por destino | 5 | PENDIENTE | — | — | — |
+| US-37 | Tool calling en agente IA | 5 | PENDIENTE | — | — | — |
+
+---
+
+## Sprint 6 — Message Queue + Observabilidad
+
+**Sprint Goal:** Robustecer el procesamiento asincrono y agregar observabilidad completa.
+**Duracion:** Semana 11-12
+**Estado:** NO INICIADO
+**SP Completados:** 0/32
+
+```
+Sprint 6: [______________________________________] 0%  (0/32 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-38 | Dead letter queue | 3 | PENDIENTE | — | — | — |
+| US-39 | Flower para monitorear Celery | 3 | PENDIENTE | — | — | — |
+| US-40 | Nuevas tasks de notificaciones | 5 | PENDIENTE | — | — | — |
+| US-41 | Event log de reservas | 3 | PENDIENTE | — | — | — |
+| US-42 | Metricas de Prometheus | 5 | PENDIENTE | — | — | — |
+| US-43 | Dashboards de Grafana | 5 | PENDIENTE | — | — | — |
+| US-44 | Tracing con OpenTelemetry | 5 | PENDIENTE | — | — | — |
+| US-45 | Logging JSON con correlation IDs | 3 | PENDIENTE | — | — | — |
+
+---
+
+## Sprint 7 — Terraform + CI/CD + Deploy Publico
+
+**Sprint Goal:** Infraestructura como codigo, pipeline completo y deploy publico funcional.
+**Duracion:** Semana 13-14
+**Estado:** NO INICIADO
+**SP Completados:** 0/33
+
+```
+Sprint 7: [______________________________________] 0%  (0/33 SP)
+```
+
+| ID | User Story | SP | Estado | Branch | PR | Fecha |
+|----|------------|----|---------|---------|----|-------|
+| US-46 | Terraform VPC + EKS | 5 | PENDIENTE | — | — | — |
+| US-47 | Terraform RDS + ElastiCache | 5 | PENDIENTE | — | — | — |
+| US-48 | Terraform IAM | 3 | PENDIENTE | — | — | — |
+| US-49 | Pipeline CI completo | 5 | PENDIENTE | — | — | — |
+| US-50 | Pipeline CD staging + prod | 5 | PENDIENTE | — | — | — |
+| US-51 | Deploy publico funcional | 5 | PENDIENTE | — | — | — |
+| US-52 | Documentacion ADRs, C4, runbook | 3 | PENDIENTE | — | — | — |
+| US-53 | README con badges y demo URL | 2 | PENDIENTE | — | — | — |
+
+---
+
+## Burndown Chart
+
+```
+Story Points
+Restantes
+  229 |*
+      |
+  213 |
+      |
+  197 |   *  ← actual (Sprint 1 completado)
+      |
+  150 |
+      |
+  125 |
+      |
+  100 |
+      |
+   75 |
+      |
+   50 |
+      |
+   25 |
+      |
+    0 |________________________________________________
+      S1         S2         S3         S4         S5         S6         S7
+      (16 SP)
+```
+
+---
+
+## Historial de Cambios
+
+| Fecha | US | Accion | SP | Herramientas usadas |
+|-------|-----|--------|----|---------------------|
+| 2026-03-06 | US-01 | COMPLETADA | 3 | Skill: start-user-story, git-workflow, finish-user-story |
+| 2026-03-06 | US-02 | COMPLETADA | 5 | Agent (worktree isolation), Skill: git-workflow |
+| 2026-03-06 | US-03 | COMPLETADA | 8 | Agent (worktree isolation), Skill: new-feature, git-workflow |
+| 2026-03-06 | US-06 | COMPLETADA | 3 | Agent (worktree isolation), Skill: git-workflow |
+| 2026-03-06 | US-04 | COMPLETADA | 5 | Agent (worktree isolation), Skill: git-workflow |
+| 2026-03-06 | US-05 | COMPLETADA | 3 | Agent (worktree isolation), Skill: git-workflow |
+| 2026-03-06 | US-07 | COMPLETADA | 5 | Agent (worktree isolation), Skill: new-feature, git-workflow |
