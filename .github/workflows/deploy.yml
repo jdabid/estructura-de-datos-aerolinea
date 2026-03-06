@@ -61,7 +61,7 @@
             RABBITMQ_URL: ""
             ENVIRONMENT: testing
             PYTHONPATH: ${{ github.workspace }}/backend
-          run: pytest backend/tests/ -v --tb=short
+          run: pytest backend/tests/ -v --tb=short --cov=backend/src --cov-report=term-missing --cov-fail-under=80
 
     build-and-push:
       needs: test
