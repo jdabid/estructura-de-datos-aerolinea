@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.shared.database import Base
 from src.features.flights.models import Destination, Flight
 from src.features.bookings.models import Booking
+from src.features.auth.models import User
 
 config = context.config
 
