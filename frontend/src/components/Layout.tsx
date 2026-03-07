@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/authStore';
 
 const navItems = [
   { path: '/', label: 'Dashboard' },
+  { path: '/flights', label: 'Vuelos' },
 ];
 
 export default function Layout() {
