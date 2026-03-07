@@ -4,6 +4,7 @@ import { useAuthStore } from './stores/authStore';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import FlightsPage from './pages/FlightsPage';
+import CreateFlightPage from './pages/CreateFlightPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -27,6 +28,7 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/flights" element={<FlightsPage />} />
+          <Route path="/create-flight" element={<CreateFlightPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
