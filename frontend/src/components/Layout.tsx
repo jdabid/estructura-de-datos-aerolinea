@@ -6,6 +6,7 @@ const navItems = [
   { path: '/flights', label: 'Vuelos' },
   { path: '/create-flight', label: 'Crear Vuelo' },
   { path: '/booking', label: 'Reservar' },
+  { path: '/bookings', label: 'Reservas' },
 ];
 
 export default function Layout() {
