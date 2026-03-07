@@ -1,7 +1,7 @@
 # Cronograma de Sprints — Tracking en Tiempo Real
 
 > Este documento se actualiza automaticamente cada vez que se finaliza una User Story.
-> Ultima actualizacion: 2026-03-06
+> Ultima actualizacion: 2026-03-07
 
 ---
 
@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 15 |
+| Completadas | 19 |
 | En progreso | 0 |
-| Pendientes | 38 |
+| Pendientes | 34 |
 | Story Points totales | 229 |
-| Story Points completados | 65 |
-| Story Points restantes | 164 |
-| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2) |
-| Sprint actual | Sprint 2 COMPLETADO |
+| Story Points completados | 86 |
+| Story Points restantes | 143 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 21 SP (Sprint 3 parcial) |
+| Sprint actual | Sprint 3 EN PROGRESO |
 
 ### Progreso Global
 
 ```
-Completado: [###########_______________________________] 28%  (65/229 SP)
+Completado: [##############____________________________] 38%  (86/229 SP)
 ```
 
 ---
@@ -97,19 +97,19 @@ Sprint 2: [######################################] 100%  (33/33 SP)
 
 **Sprint Goal:** Completar todas las paginas del frontend con funcionalidad real.
 **Duracion:** Semana 5-6
-**Estado:** NO INICIADO
-**SP Completados:** 0/34
+**Estado:** EN PROGRESO
+**SP Completados:** 21/34
 
 ```
-Sprint 3: [______________________________________] 0%  (0/34 SP)
+Sprint 3: [#######################_______________] 62%  (21/34 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
 |----|------------|----|---------|---------|----|-------|
-| US-16 | Lista de destinos y vuelos disponibles | 5 | PENDIENTE | — | — | — |
-| US-17 | Crear destinos y vuelos desde frontend | 5 | PENDIENTE | — | — | — |
-| US-18 | Crear reserva con precio en tiempo real | 8 | PENDIENTE | — | — | — |
-| US-19 | Historial de reservas | 3 | PENDIENTE | — | — | — |
+| US-16 | Lista de destinos y vuelos disponibles | 5 | DONE | `feature/s3-US16-lista-vuelos` | [#27](https://github.com/jdabid/flight-reservation-system/pull/27) | 2026-03-07 |
+| US-17 | Crear destinos y vuelos desde frontend | 5 | DONE | `feature/s3-US17-crear-vuelos` | [#28](https://github.com/jdabid/flight-reservation-system/pull/28) | 2026-03-07 |
+| US-18 | Crear reserva con precio en tiempo real | 8 | DONE | `feature/s3-US18-crear-reserva` | [#29](https://github.com/jdabid/flight-reservation-system/pull/29) | 2026-03-07 |
+| US-19 | Historial de reservas | 3 | DONE | `feature/s3-US19-historial-reservas` | [#30](https://github.com/jdabid/flight-reservation-system/pull/30) | 2026-03-07 |
 | US-20 | Graficas de estadisticas | 5 | PENDIENTE | — | — | — |
 | US-21 | Chat con agente IA | 5 | PENDIENTE | — | — | — |
 | US-22 | Dockerfile para frontend con nginx | 3 | PENDIENTE | — | — | — |
@@ -224,9 +224,11 @@ Restantes
       |
   181 |
       |
-  164 |        *  ← actual (Sprint 2 completado)
+  164 |        *
       |
   150 |
+      |
+  143 |              *  ← actual (Sprint 3 parcial)
       |
   125 |
       |
@@ -263,3 +265,7 @@ Restantes
 | 2026-03-06 | US-13 | COMPLETADA | 5 | Agent (worktree isolation), Zustand, Axios |
 | 2026-03-06 | US-15 | COMPLETADA | 2 | Agent (worktree isolation), bandit |
 | 2026-03-06 | US-14 | COMPLETADA | 5 | Agent (worktree isolation), React, stats API |
+| 2026-03-07 | US-16 | COMPLETADA | 5 | Write, Edit, Bash (git), gh CLI |
+| 2026-03-07 | US-17 | COMPLETADA | 5 | Write, Edit, Bash (git), gh CLI |
+| 2026-03-07 | US-18 | COMPLETADA | 8 | Write, Edit, Bash (git), gh CLI |
+| 2026-03-07 | US-19 | COMPLETADA | 3 | Write, Edit, Bash (git), gh CLI |
