@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flight-app-worker
+  labels:
+    app.kubernetes.io/name: flight-app
+    app.kubernetes.io/component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flight-app
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: flight-app
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: flight-app
+      containers:
+        - name: worker
+          image: ghcr.io/jdabid/flight-reservation-system/flight-app:latest
+          command: ["sh", "-c", "celery -A src.worker.celery_app worker --loglevel=info"]
+          envFrom:
+            - configMapRef:
+                name: flight-app-config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
