@@ -24,12 +24,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         command: ["sh", "-c", "{{ .Values.worker.command }}"]
         resources:
-          limits:
-            cpu: 300m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
+          {{- toYaml .Values.resources.worker | nindent 10 }}
         envFrom:
         - configMapRef:
             name: {{ include "flight-app.fullname" . }}-config
