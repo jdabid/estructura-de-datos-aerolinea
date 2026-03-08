@@ -1,6 +1,10 @@
+# docker-compose.yml - Flight Reservation System
+# Version: 2.0 - Profesionalizado con redes, volumenes, healthchecks y logging
 version: '3.8'
+
 services:
   api:
+    container_name: flight-api
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
@@ -22,8 +26,24 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - backend
+      - frontend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   worker:
+    container_name: flight-worker
     build:
       context: .
       dockerfile: infra/docker/Dockerfile
@@ -40,8 +60,23 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A src.worker.celery_app inspect ping --timeout 10"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   db:
+    container_name: flight-db
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: user
@@ -50,24 +85,44 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U user -d flights
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
+    container_name: flight-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: redis-cli ping
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   rabbitmq:
+    container_name: flight-rabbitmq
     image: rabbitmq:3-management-alpine
     ports:
       - "5672:5672"
@@ -75,21 +130,59 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
+    container_name: flight-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     restart: unless-stopped
+    networks:
+      - frontend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
-  postgres_data:
+  db-data:
+    name: flight-db-data
+  redis-data:
+    name: flight-redis-data
+  rabbitmq-data:
+    name: flight-rabbitmq-data
+
+networks:
+  backend:
+    name: flight-backend
+    driver: bridge
+  frontend:
+    name: flight-frontend
+    driver: bridge
