@@ -1,4 +1,4 @@
-.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint
+.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint kustomize-build-dev kustomize-build-staging kustomize-build-prod kustomize-validate kustomize-diff
 
 help: ## Mostrar ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -82,3 +82,19 @@ helm-template: ## Renderizar templates Helm
 
 helm-lint: ## Validar Helm chart
 	helm lint ./infra/helm/flight-app
+
+# === Kustomize ===
+kustomize-build-dev: ## Build kustomize for dev
+	kubectl kustomize infra/kustomize/overlays/dev/
+
+kustomize-build-staging: ## Build kustomize for staging
+	kubectl kustomize infra/kustomize/overlays/staging/
+
+kustomize-build-prod: ## Build kustomize for prod
+	kubectl kustomize infra/kustomize/overlays/prod/
+
+kustomize-validate: ## Validate all kustomize builds
+	@bash scripts/validate-kustomize.sh
+
+kustomize-diff: ## Show diff between staging and prod
+	@diff <(kubectl kustomize infra/kustomize/overlays/staging/) <(kubectl kustomize infra/kustomize/overlays/prod/) || true
