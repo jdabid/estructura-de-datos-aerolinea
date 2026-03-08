@@ -31,3 +31,15 @@ def get_destination_taxes(destination_name: str, db: Session = Depends(get_db)):
 def get_candy_distribution():
     """Logs de distribucion de dulces a infantes."""
     return queries.get_candy_logs()
+
+
+@router.get("/dead-letters")
+async def get_dead_letters(limit: int = 20):
+    """Lista los ultimos mensajes en la dead letter queue."""
+    from src.shared.redis_client import redis_client
+    import json
+    entries = redis_client.lrange("logs:dead_letter", 0, limit - 1)
+    return {
+        "count": redis_client.llen("logs:dead_letter"),
+        "entries": [json.loads(e) for e in entries],
+    }
