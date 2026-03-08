@@ -1,0 +1,49 @@
+{{- if .Values.networkPolicy.enabled }}
+# API NetworkPolicy - only allow ingress from ingress controller and frontend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "flight-app.fullname" . }}-api
+  labels:
+    {{- include "flight-app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "flight-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: frontend
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to: []  # Allow all egress (DB, Redis, RabbitMQ, external APIs)
+---
+# Worker NetworkPolicy - no ingress needed, only egress to DB/Redis/RabbitMQ
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "flight-app.fullname" . }}-worker
+  labels:
+    {{- include "flight-app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "flight-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []  # No ingress to worker
+  egress:
+    - to: []  # Allow all egress (DB, Redis, RabbitMQ)
+{{- end }}
