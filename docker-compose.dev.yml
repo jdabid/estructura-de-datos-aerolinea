@@ -1,0 +1,26 @@
+# Development overrides - use with:
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+version: '3.8'
+services:
+  api:
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=true
+
+  worker:
+    command: celery -A src.worker.celery_app worker --loglevel=debug
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infra/docker/Dockerfile.dev
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
