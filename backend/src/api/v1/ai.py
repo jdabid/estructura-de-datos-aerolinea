@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from src.features.ai.agent import get_ai_agent
-from src.features.ai.tools import get_flight_market_data, get_demand_stats
+from src.features.ai.tools import get_flight_market_data, get_demand_stats, search_destinations_by_description
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,15 +20,21 @@ class PriceSuggestionRequest(BaseModel):
 def run_agent(user_input: str) -> str:
     llm = get_ai_agent()
 
+    # RAG: buscar destinos semanticamente relevantes
+    semantic_results = search_destinations_by_description.invoke({"query": user_input})
+
+    # Datos existentes
     market_data = get_flight_market_data.invoke({"destination_name": user_input})
     demand_data = get_demand_stats.invoke({})
 
     prompt = (
-        f"Eres un asistente de vuelos. Responde en espanol.\n\n"
+        f"Eres un asistente de vuelos inteligente. Responde en espanol.\n\n"
+        f"Destinos relevantes (busqueda semantica): {semantic_results}\n"
         f"Datos del mercado: {market_data}\n"
         f"Estadisticas de demanda: {demand_data}\n\n"
         f"Pregunta del usuario: {user_input}\n\n"
-        f"Responde de forma clara y concisa basandote en los datos disponibles."
+        f"Responde de forma clara y concisa basandote en los datos disponibles. "
+        f"Si hay destinos similares, mencionalos como sugerencias."
     )
 
     response = llm.invoke(prompt)
