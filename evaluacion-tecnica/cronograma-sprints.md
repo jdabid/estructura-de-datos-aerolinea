@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 22 |
+| Completadas | 30 |
 | En progreso | 0 |
-| Pendientes | 31 |
+| Pendientes | 23 |
 | Story Points totales | 229 |
-| Story Points completados | 99 |
-| Story Points restantes | 130 |
-| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3) |
-| Sprint actual | Sprint 3 COMPLETADO |
+| Story Points completados | 131 |
+| Story Points restantes | 98 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3), 32 SP (Sprint 4) |
+| Sprint actual | Sprint 4 COMPLETADO |
 
 ### Progreso Global
 
 ```
-Completado: [################__________________________] 43%  (99/229 SP)
+Completado: [######################____________________] 57%  (131/229 SP)
 ```
 
 ---
@@ -130,23 +130,32 @@ Sprint 3: [######################################] 100%  (34/34 SP)
 
 **Sprint Goal:** Contenedorizacion profesional y despliegue base en Kubernetes con Helm.
 **Duracion:** Semana 7-8
-**Estado:** NO INICIADO
-**SP Completados:** 0/32
+**Estado:** COMPLETADO
+**SP Completados:** 32/32
 
 ```
-Sprint 4: [______________________________________] 0%  (0/32 SP)
+Sprint 4: [######################################] 100%  (32/32 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
 |----|------------|----|---------|---------|----|-------|
-| US-23 | Docker Compose con todos los servicios | 5 | PENDIENTE | — | — | — |
-| US-24 | Docker Compose dev con hot-reload | 3 | PENDIENTE | — | — | — |
-| US-25 | Makefile con comandos rapidos | 2 | PENDIENTE | — | — | — |
-| US-26 | Helm Chart con templates | 8 | PENDIENTE | — | — | — |
-| US-27 | HPA para autoescalado | 3 | PENDIENTE | — | — | — |
-| US-28 | Ingress controller con TLS | 5 | PENDIENTE | — | — | — |
-| US-29 | Network policies | 3 | PENDIENTE | — | — | — |
-| US-30 | Resource requests y limits | 3 | PENDIENTE | — | — | — |
+| US-23 | Docker Compose con todos los servicios | 5 | DONE | `feature/s4-US23-docker-compose-pro` | [#34](https://github.com/jdabid/flight-reservation-system/pull/34) | 2026-03-07 |
+| US-24 | Docker Compose dev con hot-reload | 3 | DONE | `feature/s4-US24-docker-dev` | [#35](https://github.com/jdabid/flight-reservation-system/pull/35) | 2026-03-07 |
+| US-25 | Makefile con comandos rapidos | 2 | DONE | `feature/s4-US25-makefile` | [#36](https://github.com/jdabid/flight-reservation-system/pull/36) | 2026-03-07 |
+| US-26 | Helm Chart con templates | 8 | DONE | `feature/s4-US26-helm-chart` | [#37](https://github.com/jdabid/flight-reservation-system/pull/37) | 2026-03-07 |
+| US-27 | HPA para autoescalado | 3 | DONE | `feature/s4-US27-hpa-autoescalado` | [#38](https://github.com/jdabid/flight-reservation-system/pull/38) | 2026-03-07 |
+| US-28 | Ingress controller con TLS | 5 | DONE | `feature/s4-US28-ingress-tls` | [#39](https://github.com/jdabid/flight-reservation-system/pull/39) | 2026-03-07 |
+| US-29 | Network policies | 3 | DONE | `feature/s4-US29-network-policies` | [#40](https://github.com/jdabid/flight-reservation-system/pull/40) | 2026-03-07 |
+| US-30 | Resource requests y limits | 3 | DONE | `feature/s4-US30-resource-limits` | [#41](https://github.com/jdabid/flight-reservation-system/pull/41) | 2026-03-07 |
+
+### Notas del Sprint 4
+- Batch 1 (US-23 a US-26): 4 agentes en paralelo con worktree isolation
+- Batch 2 (US-27 a US-30): 4 agentes en paralelo con worktree isolation
+- US-29 requirio rebase por conflicto en values.yaml con US-28 (resuelto: mantener ambas secciones)
+- US-30 rebase limpio sin conflictos
+- Helm chart profesional con _helpers.tpl, deployments separados (API/Worker), HPA v2, Ingress TLS, NetworkPolicies
+- Makefile con 22 targets para desarrollo rapido
+- Sprint 4 completado: 32/32 SP
 
 ---
 
@@ -240,7 +249,9 @@ Restantes
       |
   143 |
       |
-  130 |              *  ← actual (Sprint 3 completado)
+  130 |              *
+      |
+   98 |                    *  ← actual (Sprint 4 completado)
       |
   100 |
       |
@@ -282,3 +293,11 @@ Restantes
 | 2026-03-07 | US-20 | COMPLETADA | 5 | Agent (worktree isolation), recharts, npm |
 | 2026-03-07 | US-21 | COMPLETADA | 5 | Agent (worktree isolation), rebase conflictos |
 | 2026-03-07 | US-22 | COMPLETADA | 3 | Agent (worktree isolation), Docker, nginx |
+| 2026-03-07 | US-23 | COMPLETADA | 5 | Agent (worktree isolation), Docker Compose |
+| 2026-03-07 | US-24 | COMPLETADA | 3 | Agent (worktree isolation), Docker Compose dev |
+| 2026-03-07 | US-25 | COMPLETADA | 2 | Agent (worktree isolation), Makefile |
+| 2026-03-07 | US-26 | COMPLETADA | 8 | Agent (worktree isolation), Helm, _helpers.tpl |
+| 2026-03-07 | US-27 | COMPLETADA | 3 | Agent (worktree isolation), Helm HPA v2 |
+| 2026-03-07 | US-28 | COMPLETADA | 5 | Agent (worktree isolation), Helm Ingress TLS |
+| 2026-03-07 | US-29 | COMPLETADA | 3 | Agent (worktree isolation), Helm NetworkPolicy |
+| 2026-03-07 | US-30 | COMPLETADA | 3 | Agent (worktree isolation), Helm resources |
