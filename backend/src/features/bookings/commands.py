@@ -4,6 +4,7 @@ from src.features.flights.models import Flight
 from src.shared.exceptions import NotFoundException, ValidationException
 from src.worker.tasks import process_booking_event, send_booking_confirmation
 from src.features.bookings.event_logger import log_booking_event
+from src.shared.metrics import BOOKINGS_TOTAL, BOOKING_PRICE
 import json
 import logging
 
@@ -36,6 +37,9 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
+
+    BOOKINGS_TOTAL.labels(destination=destination.name).inc()
+    BOOKING_PRICE.observe(total_final)
 
     payload = {
         "id": db_booking.id,
