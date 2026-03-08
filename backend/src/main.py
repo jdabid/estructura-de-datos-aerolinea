@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1 import flights, bookings, ai, auth, stats
 from src.shared.exceptions import AppException, app_exception_handler
 from src.shared.middleware import RateLimitMiddleware
+from src.shared.metrics import setup_metrics
 from src.features.bookings.event_log import BookingEvent  # noqa: F401
 
 # Las tablas se gestionan con Alembic (ver alembic/ para migraciones)
@@ -30,7 +31,10 @@ app.include_router(ai.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(stats.router, prefix="/api/v1")
 
+# Prometheus metrics
+setup_metrics(app)
 
-@app.get("/")
+
+@app.get("/health")
 def health_check():
     return {"status": "ok", "message": "Sistema con Agente de IA Operativo"}

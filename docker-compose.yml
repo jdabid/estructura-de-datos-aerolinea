@@ -181,6 +181,31 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  prometheus:
+    container_name: flight-prometheus
+    image: prom/prometheus:v2.50.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frontend:
     container_name: flight-frontend
     build:
@@ -213,6 +238,8 @@ volumes:
     name: flight-redis-data
   rabbitmq-data:
     name: flight-rabbitmq-data
+  prometheus-data:
+    name: flight-prometheus-data
 
 networks:
   backend:
