@@ -43,3 +43,15 @@ async def get_dead_letters(limit: int = 20):
         "count": redis_client.llen("logs:dead_letter"),
         "entries": [json.loads(e) for e in entries],
     }
+
+
+@router.get("/notifications")
+async def get_notifications(limit: int = 20):
+    """Lista las ultimas notificaciones enviadas."""
+    from src.shared.redis_client import redis_client
+    import json
+    entries = redis_client.lrange("logs:notifications", 0, limit - 1)
+    return {
+        "total_sent": int(redis_client.get("stats:notifications_sent") or 0),
+        "notifications": [json.loads(e) for e in entries],
+    }
