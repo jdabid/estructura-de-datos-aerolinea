@@ -62,3 +62,37 @@ def search_destinations_by_description(query: str) -> str:
     if not results:
         return "No se encontraron destinos con embeddings almacenados. Usa /ai/embed-destination primero."
     return json.dumps(results, ensure_ascii=False)
+
+
+@tool
+def predict_demand(destination_name: str) -> str:
+    """Predice la demanda futura de un destino basandose en datos historicos de Redis y tendencias."""
+    current_count = redis_client.get(f"stats:destination:{destination_name}") or 0
+    current_count = int(current_count)
+
+    all_stats = {}
+    cursor = 0
+    while True:
+        cursor, keys = redis_client.scan(cursor, match="stats:destination:*", count=100)
+        for key in keys:
+            dest = key.split(":")[-1]
+            all_stats[dest] = int(redis_client.get(key) or 0)
+        if cursor == 0:
+            break
+
+    total_bookings = sum(all_stats.values()) if all_stats else 0
+    market_share = (current_count / total_bookings * 100) if total_bookings > 0 else 0
+
+    avg_bookings = total_bookings / len(all_stats) if all_stats else 0
+    trend = "alta" if current_count > avg_bookings * 1.2 else "baja" if current_count < avg_bookings * 0.8 else "estable"
+
+    projected_next_period = int(current_count * 1.1) if trend == "alta" else int(current_count * 0.9) if trend == "baja" else current_count
+
+    return json.dumps({
+        "destination": destination_name,
+        "current_bookings": current_count,
+        "market_share_percent": round(market_share, 2),
+        "trend": trend,
+        "projected_next_period": projected_next_period,
+        "recommendation": f"Demanda {trend}. {'Considerar aumentar precios o capacidad.' if trend == 'alta' else 'Considerar promociones para estimular demanda.' if trend == 'baja' else 'Mantener estrategia actual.'}"
+    }, ensure_ascii=False)

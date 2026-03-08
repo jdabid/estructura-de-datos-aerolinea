@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from src.features.ai.agent import get_ai_agent
-from src.features.ai.tools import get_flight_market_data, get_demand_stats, search_destinations_by_description
+from src.features.ai.tools import get_flight_market_data, get_demand_stats, search_destinations_by_description, predict_demand
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,6 +15,10 @@ class ChatRequest(BaseModel):
 
 
 class PriceSuggestionRequest(BaseModel):
+    destination_name: str
+
+
+class DemandPredictionRequest(BaseModel):
     destination_name: str
 
 
@@ -74,6 +79,30 @@ async def suggest_price(request: PriceSuggestionRequest):
     except Exception:
         logger.exception("AI suggest-price error")
         raise HTTPException(status_code=500, detail="Error procesando sugerencia de precio")
+
+
+@router.post("/predict-demand")
+async def predict_demand_endpoint(request: DemandPredictionRequest):
+    """Predice la demanda futura de un destino basandose en datos historicos."""
+    llm = get_ai_agent()
+
+    prediction_data = predict_demand.invoke({"destination_name": request.destination_name})
+    market_data = get_flight_market_data.invoke({"destination_name": request.destination_name})
+
+    prompt = (
+        f"Eres un analista de demanda de vuelos. Responde en espanol.\n\n"
+        f"Prediccion de demanda: {prediction_data}\n"
+        f"Datos del mercado: {market_data}\n\n"
+        f"Analiza estos datos y da una prediccion detallada sobre la demanda futura del destino "
+        f"'{request.destination_name}'. Incluye recomendaciones de precios y capacidad."
+    )
+
+    try:
+        response = llm.invoke(prompt)
+        return {"prediction": response.content, "data": json.loads(prediction_data)}
+    except Exception:
+        logger.exception("AI predict-demand error")
+        raise HTTPException(status_code=500, detail="Error procesando prediccion de demanda")
 
 
 @router.post("/embed-destination")
