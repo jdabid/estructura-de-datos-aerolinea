@@ -16,6 +16,7 @@ redis==5.0.1
 
 # Worker
 celery==5.3.6
+flower>=2.0.0
 
 # AI Agent
 langchain>=0.3.0

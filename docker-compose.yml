@@ -75,6 +75,40 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  flower:
+    container_name: flight-flower
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    command: celery -A src.worker.celery_app flower --port=5555 --broker_api=http://admin:admin123@rabbitmq:15672/api/
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5555:5555"
+    environment:
+      - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
+      - REDIS_HOST=redis
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   db:
     container_name: flight-db
     image: pgvector/pgvector:pg15
