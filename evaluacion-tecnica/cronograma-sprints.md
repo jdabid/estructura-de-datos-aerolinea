@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 19 |
+| Completadas | 22 |
 | En progreso | 0 |
-| Pendientes | 34 |
+| Pendientes | 31 |
 | Story Points totales | 229 |
-| Story Points completados | 86 |
-| Story Points restantes | 143 |
-| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 21 SP (Sprint 3 parcial) |
-| Sprint actual | Sprint 3 EN PROGRESO |
+| Story Points completados | 99 |
+| Story Points restantes | 130 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3) |
+| Sprint actual | Sprint 3 COMPLETADO |
 
 ### Progreso Global
 
 ```
-Completado: [##############____________________________] 38%  (86/229 SP)
+Completado: [################__________________________] 43%  (99/229 SP)
 ```
 
 ---
@@ -97,11 +97,11 @@ Sprint 2: [######################################] 100%  (33/33 SP)
 
 **Sprint Goal:** Completar todas las paginas del frontend con funcionalidad real.
 **Duracion:** Semana 5-6
-**Estado:** EN PROGRESO
-**SP Completados:** 21/34
+**Estado:** COMPLETADO
+**SP Completados:** 34/34
 
 ```
-Sprint 3: [#######################_______________] 62%  (21/34 SP)
+Sprint 3: [######################################] 100%  (34/34 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
@@ -110,9 +110,19 @@ Sprint 3: [#######################_______________] 62%  (21/34 SP)
 | US-17 | Crear destinos y vuelos desde frontend | 5 | DONE | `feature/s3-US17-crear-vuelos` | [#28](https://github.com/jdabid/flight-reservation-system/pull/28) | 2026-03-07 |
 | US-18 | Crear reserva con precio en tiempo real | 8 | DONE | `feature/s3-US18-crear-reserva` | [#29](https://github.com/jdabid/flight-reservation-system/pull/29) | 2026-03-07 |
 | US-19 | Historial de reservas | 3 | DONE | `feature/s3-US19-historial-reservas` | [#30](https://github.com/jdabid/flight-reservation-system/pull/30) | 2026-03-07 |
-| US-20 | Graficas de estadisticas | 5 | PENDIENTE | — | — | — |
-| US-21 | Chat con agente IA | 5 | PENDIENTE | — | — | — |
-| US-22 | Dockerfile para frontend con nginx | 3 | PENDIENTE | — | — | — |
+| US-20 | Graficas de estadisticas | 5 | DONE | `feature/s3-US20-graficas-estadisticas` | [#31](https://github.com/jdabid/flight-reservation-system/pull/31) | 2026-03-07 |
+| US-21 | Chat con agente IA | 5 | DONE | `feature/s3-US21-chat-ia` | [#32](https://github.com/jdabid/flight-reservation-system/pull/32) | 2026-03-07 |
+| US-22 | Dockerfile para frontend con nginx | 3 | DONE | `feature/s3-US22-dockerfile-frontend` | [#33](https://github.com/jdabid/flight-reservation-system/pull/33) | 2026-03-07 |
+
+### Notas del Sprint 3
+- US-16 a US-19 implementadas secuencialmente desde contexto principal (agentes bloqueados por permisos)
+- US-20, US-21, US-22 implementadas en paralelo con Agents worktree (permisos wildcard configurados)
+- US-21 requirio rebase por conflicto en App.tsx y Layout.tsx con US-20 (resuelto)
+- US-22 sin conflictos (solo archivos de infra)
+- Nuevas paginas: FlightsPage, CreateFlightPage, BookingPage, BookingsPage, StatsPage, ChatPage
+- Recharts agregado para graficas interactivas
+- Dockerfile multi-stage + nginx para produccion del frontend
+- Sprint 3 completado: 34/34 SP
 
 ---
 
@@ -228,9 +238,9 @@ Restantes
       |
   150 |
       |
-  143 |              *  ← actual (Sprint 3 parcial)
+  143 |
       |
-  125 |
+  130 |              *  ← actual (Sprint 3 completado)
       |
   100 |
       |
@@ -269,3 +279,6 @@ Restantes
 | 2026-03-07 | US-17 | COMPLETADA | 5 | Write, Edit, Bash (git), gh CLI |
 | 2026-03-07 | US-18 | COMPLETADA | 8 | Write, Edit, Bash (git), gh CLI |
 | 2026-03-07 | US-19 | COMPLETADA | 3 | Write, Edit, Bash (git), gh CLI |
+| 2026-03-07 | US-20 | COMPLETADA | 5 | Agent (worktree isolation), recharts, npm |
+| 2026-03-07 | US-21 | COMPLETADA | 5 | Agent (worktree isolation), rebase conflictos |
+| 2026-03-07 | US-22 | COMPLETADA | 3 | Agent (worktree isolation), Docker, nginx |
