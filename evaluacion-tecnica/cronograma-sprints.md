@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 30 |
+| Completadas | 37 |
 | En progreso | 0 |
-| Pendientes | 23 |
+| Pendientes | 16 |
 | Story Points totales | 229 |
-| Story Points completados | 131 |
-| Story Points restantes | 98 |
-| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3), 32 SP (Sprint 4) |
-| Sprint actual | Sprint 4 COMPLETADO |
+| Story Points completados | 164 |
+| Story Points restantes | 65 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3), 32 SP (Sprint 4), 33 SP (Sprint 5) |
+| Sprint actual | Sprint 5 COMPLETADO |
 
 ### Progreso Global
 
 ```
-Completado: [######################____________________] 57%  (131/229 SP)
+Completado: [############################______________] 72%  (164/229 SP)
 ```
 
 ---
@@ -163,22 +163,32 @@ Sprint 4: [######################################] 100%  (32/32 SP)
 
 **Sprint Goal:** Configurar ambientes con Kustomize y mejorar el agente de IA con RAG avanzado.
 **Duracion:** Semana 9-10
-**Estado:** NO INICIADO
-**SP Completados:** 0/33
+**Estado:** COMPLETADO
+**SP Completados:** 33/33
 
 ```
-Sprint 5: [______________________________________] 0%  (0/33 SP)
+Sprint 5: [######################################] 100%  (33/33 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
 |----|------------|----|---------|---------|----|-------|
-| US-31 | Kustomize base con manifiestos | 5 | PENDIENTE | — | — | — |
-| US-32 | Overlays para dev, staging, prod | 5 | PENDIENTE | — | — | — |
-| US-33 | Kustomize build valido por ambiente | 3 | PENDIENTE | — | — | — |
-| US-34 | pgvector en PostgreSQL | 5 | PENDIENTE | — | — | — |
-| US-35 | Busqueda semantica en agente IA | 5 | PENDIENTE | — | — | — |
-| US-36 | Prediccion de demanda por destino | 5 | PENDIENTE | — | — | — |
-| US-37 | Tool calling en agente IA | 5 | PENDIENTE | — | — | — |
+| US-31 | Kustomize base con manifiestos | 5 | DONE | `feature/s5-US31-kustomize-base` | [#42](https://github.com/jdabid/flight-reservation-system/pull/42) | 2026-03-07 |
+| US-32 | Overlays para dev, staging, prod | 5 | DONE | `feature/s5-US32-kustomize-overlays` | [#43](https://github.com/jdabid/flight-reservation-system/pull/43) | 2026-03-07 |
+| US-33 | Kustomize build valido por ambiente | 3 | DONE | `feature/s5-US33-kustomize-validate` | [#44](https://github.com/jdabid/flight-reservation-system/pull/44) | 2026-03-07 |
+| US-34 | pgvector en PostgreSQL | 5 | DONE | `feature/s5-US34-pgvector` | [#45](https://github.com/jdabid/flight-reservation-system/pull/45) | 2026-03-07 |
+| US-35 | Busqueda semantica en agente IA | 5 | DONE | `feature/s5-US35-busqueda-semantica` | [#46](https://github.com/jdabid/flight-reservation-system/pull/46) | 2026-03-07 |
+| US-36 | Prediccion de demanda por destino | 5 | DONE | `feature/s5-US36-prediccion-demanda` | [#47](https://github.com/jdabid/flight-reservation-system/pull/47) | 2026-03-07 |
+| US-37 | Tool calling en agente IA | 5 | DONE | `feature/s5-US37-tool-calling` | [#48](https://github.com/jdabid/flight-reservation-system/pull/48) | 2026-03-07 |
+
+### Notas del Sprint 5
+- Batch 1 (US-31 a US-34): 4 agentes en paralelo con worktree isolation
+- Batch 2 (US-35 a US-37): 3 agentes en paralelo con worktree isolation
+- US-32 y US-33 conflictos en kustomize base (REC-01): ambos crearon archivos base, resuelto tomando master
+- US-36 conflicto en tools.py y ai.py con US-35 (REC-01): mantener ambas funciones
+- US-37 conflicto en ai.py con US-35/36: refactorizar a tool calling integrando todas las tools
+- Worktrees anidados (ERR-S4-03 recurrente): batch 2 dentro de worktree residual de US-33
+- Agente IA refactorizado de prompt-stuffing a LangChain tool calling real
+- Sprint 5 completado: 33/33 SP
 
 ---
 
@@ -251,7 +261,9 @@ Restantes
       |
   130 |              *
       |
-   98 |                    *  ← actual (Sprint 4 completado)
+   98 |                    *
+      |
+   65 |                          *  ← actual (Sprint 5 completado)
       |
   100 |
       |
@@ -301,3 +313,10 @@ Restantes
 | 2026-03-07 | US-28 | COMPLETADA | 5 | Agent (worktree isolation), Helm Ingress TLS |
 | 2026-03-07 | US-29 | COMPLETADA | 3 | Agent (worktree isolation), Helm NetworkPolicy |
 | 2026-03-07 | US-30 | COMPLETADA | 3 | Agent (worktree isolation), Helm resources |
+| 2026-03-07 | US-31 | COMPLETADA | 5 | Agent (worktree isolation), Kustomize |
+| 2026-03-07 | US-32 | COMPLETADA | 5 | Agent (worktree isolation), Kustomize overlays |
+| 2026-03-07 | US-33 | COMPLETADA | 3 | Agent (worktree isolation), Bash, Makefile |
+| 2026-03-07 | US-34 | COMPLETADA | 5 | Agent (worktree isolation), pgvector, SQLAlchemy |
+| 2026-03-07 | US-35 | COMPLETADA | 5 | Agent (worktree isolation), LangChain RAG |
+| 2026-03-07 | US-36 | COMPLETADA | 5 | Agent (worktree isolation), Redis stats, LangChain |
+| 2026-03-07 | US-37 | COMPLETADA | 5 | Agent (worktree isolation), LangChain AgentExecutor |
