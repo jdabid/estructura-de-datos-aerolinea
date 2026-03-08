@@ -1,4 +1,4 @@
-.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security flower grafana jaeger fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint kustomize-build-dev kustomize-build-staging kustomize-build-prod kustomize-validate kustomize-diff
+.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security flower grafana jaeger fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint kustomize-build-dev kustomize-build-staging kustomize-build-prod kustomize-validate kustomize-diff deploy-dev deploy-staging deploy-prod healthcheck status
 
 help: ## Mostrar ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -111,3 +111,21 @@ kustomize-validate: ## Validate all kustomize builds
 
 kustomize-diff: ## Show diff between staging and prod
 	@diff <(kubectl kustomize infra/kustomize/overlays/staging/) <(kubectl kustomize infra/kustomize/overlays/prod/) || true
+
+# === Deploy ===
+deploy-dev: ## Desplegar en modo desarrollo
+	@bash scripts/deploy.sh --env dev --build
+
+deploy-staging: ## Desplegar en modo staging
+	@bash scripts/deploy.sh --env staging --build --migrate
+
+deploy-prod: ## Desplegar en modo produccion
+	@bash scripts/deploy.sh --env prod --build --migrate
+
+healthcheck: ## Verificar salud de todos los servicios
+	@bash scripts/healthcheck.sh
+
+status: ## Mostrar estado de servicios y health check
+	@docker compose ps
+	@echo ""
+	@bash scripts/healthcheck.sh
