@@ -21,6 +21,8 @@ services:
       - JWT_SECRET_KEY=super-secret-jwt-key-change-in-production
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=flight-api
+      - LOG_FORMAT=json
+      - LOG_LEVEL=INFO
     depends_on:
       db:
         condition: service_healthy
@@ -59,6 +61,8 @@ services:
       - REDIS_HOST=redis
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_SERVICE_NAME=flight-worker
+      - LOG_FORMAT=json
+      - LOG_LEVEL=INFO
     depends_on:
       redis:
         condition: service_healthy
