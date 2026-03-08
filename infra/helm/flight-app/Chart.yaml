@@ -1,6 +1,6 @@
 apiVersion: v2
-name: fligth-app
-description: Sistema de reservas de vuelos con agente de IA
+name: flight-app
+description: Flight Reservation System Helm Chart
 type: application
 version: 1.0.0
 appVersion: "1.0.0"

@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-config
+  name: {{ include "flight-app.fullname" . }}-config
+  labels:
+    {{- include "flight-app.labels" . | nindent 4 }}
 data:
   DATABASE_URL: {{ .Values.env.DATABASE_URL | quote }}
   RABBITMQ_URL: {{ .Values.env.RABBITMQ_URL | quote }}
@@ -11,7 +13,9 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-secrets
+  name: {{ include "flight-app.fullname" . }}-secrets
+  labels:
+    {{- include "flight-app.labels" . | nindent 4 }}
 type: Opaque
 data:
   GROQ_API_KEY: {{ .Values.secrets.GROQ_API_KEY | b64enc | quote }}
