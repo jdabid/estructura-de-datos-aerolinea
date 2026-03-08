@@ -1,22 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-api
+  name: {{ include "flight-app.fullname" . }}-api
   labels:
-    app: flight-api
+    {{- include "flight-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      app: flight-api
+      {{- include "flight-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
   template:
     metadata:
       labels:
-        app: flight-api
+        {{- include "flight-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api
       annotations:
         prometheus.io/scrape: "{{ .Values.prometheus.scrape }}"
         prometheus.io/port: "{{ .Values.prometheus.port }}"
     spec:
+      serviceAccountName: {{ include "flight-app.fullname" . }}
       containers:
       - name: api
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -31,9 +37,9 @@ spec:
             memory: {{ .Values.resources.requests.memory }}
         envFrom:
         - configMapRef:
-            name: {{ .Release.Name }}-config
+            name: {{ include "flight-app.fullname" . }}-config
         - secretRef:
-            name: {{ .Release.Name }}-secrets
+            name: {{ include "flight-app.fullname" . }}-secrets
         livenessProbe:
           httpGet:
             path: {{ .Values.healthcheck.path }}
@@ -50,57 +56,3 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
----
-{{- if .Values.worker.enabled }}
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Release.Name }}-worker
-  labels:
-    app: flight-worker
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: flight-worker
-  template:
-    metadata:
-      labels:
-        app: flight-worker
-    spec:
-      containers:
-      - name: worker
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        command: ["sh", "-c", "{{ .Values.worker.command }}"]
-        resources:
-          limits:
-            cpu: 300m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        envFrom:
-        - configMapRef:
-            name: {{ .Release.Name }}-config
-{{- end }}
----
-{{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: {{ .Release.Name }}-api-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: {{ .Release.Name }}-api
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
-{{- end }}

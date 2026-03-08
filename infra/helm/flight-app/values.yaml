@@ -1,5 +1,12 @@
 replicaCount: 2
 
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
 image:
   repository: ghcr.io/jdabid/flight-reservation-system/flight-app
   tag: latest
