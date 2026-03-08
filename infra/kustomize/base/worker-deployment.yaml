@@ -21,10 +21,17 @@ spec:
       containers:
         - name: worker
           image: ghcr.io/jdabid/flight-reservation-system/flight-app:latest
-          command: ["sh", "-c", "celery -A src.worker.celery_app worker --loglevel=info"]
+          command:
+            - celery
+            - -A
+            - src.worker.celery_app
+            - worker
+            - --loglevel=info
           envFrom:
             - configMapRef:
                 name: flight-app-config
+            - secretRef:
+                name: flight-app-secret
           resources:
             requests:
               cpu: 100m
