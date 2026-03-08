@@ -3,6 +3,7 @@ from . import models, schemas
 from src.features.flights.models import Flight
 from src.shared.exceptions import NotFoundException, ValidationException
 from src.worker.tasks import process_booking_event, send_booking_confirmation
+from src.features.bookings.event_logger import log_booking_event
 import json
 import logging
 
@@ -60,5 +61,7 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
         send_booking_confirmation.delay(json.dumps(confirmation_payload))
     except Exception:
         logger.exception("Failed to dispatch booking confirmation for booking %s", db_booking.id)
+
+    log_booking_event("booking_created", db_booking.id, payload)
 
     return db_booking

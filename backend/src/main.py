@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1 import flights, bookings, ai, auth, stats
 from src.shared.exceptions import AppException, app_exception_handler
 from src.shared.middleware import RateLimitMiddleware
+from src.features.bookings.event_log import BookingEvent  # noqa: F401
 
 # Las tablas se gestionan con Alembic (ver alembic/ para migraciones)
 # Para aplicar: alembic upgrade head
