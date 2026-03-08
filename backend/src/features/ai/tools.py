@@ -52,3 +52,13 @@ def get_demand_stats() -> str:
         "total_revenue_to_date": total_revenue,
         "total_infant_travelers": total_infant_count,
     })
+
+
+@tool
+def search_destinations_by_description(query: str) -> str:
+    """Busca destinos similares basandose en la descripcion usando busqueda semantica con pgvector."""
+    from src.shared.embeddings import search_similar_destinations
+    results = search_similar_destinations(query, limit=5)
+    if not results:
+        return "No se encontraron destinos con embeddings almacenados. Usa /ai/embed-destination primero."
+    return json.dumps(results, ensure_ascii=False)
