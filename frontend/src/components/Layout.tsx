@@ -8,6 +8,7 @@ const navItems = [
   { path: '/booking', label: 'Reservar' },
   { path: '/bookings', label: 'Reservas' },
   { path: '/stats', label: 'Estadisticas' },
+  { path: '/chat', label: 'Asistente IA' },
 ];
 
 export default function Layout() {
@@ -15,7 +16,7 @@ export default function Layout() {
   const { user, logout } = useAuthStore();
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="h-screen bg-gray-900 flex">
       <aside className="w-64 bg-gray-800 border-r border-gray-700">
         <div className="p-4 border-b border-gray-700">
           <h2 className="text-lg font-bold text-white">Flight System</h2>
@@ -45,7 +46,7 @@ export default function Layout() {
           </button>
         </div>
       </aside>
-      <main className="flex-1">
+      <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
     </div>

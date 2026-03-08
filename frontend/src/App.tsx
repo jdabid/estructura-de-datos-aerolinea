@@ -8,6 +8,7 @@ import CreateFlightPage from './pages/CreateFlightPage';
 import BookingPage from './pages/BookingPage';
 import BookingsPage from './pages/BookingsPage';
 import StatsPage from './pages/StatsPage';
+import ChatPage from './pages/ChatPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/chat" element={<ChatPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
