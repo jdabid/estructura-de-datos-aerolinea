@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: flight-app
 data:
-  DATABASE_URL: "postgresql://user:pass@db:5432/flights"
-  RABBITMQ_URL: "pyamqp://admin:admin123@rabbitmq:5672//"
+  DATABASE_URL: "postgresql://flight_user:flight_pass@db:5432/flights"
+  RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672//"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"

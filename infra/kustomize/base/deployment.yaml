@@ -16,9 +16,6 @@ spec:
       labels:
         app.kubernetes.io/name: flight-app
         app.kubernetes.io/component: api
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8000"
     spec:
       serviceAccountName: flight-app
       containers:
@@ -31,7 +28,7 @@ spec:
             - configMapRef:
                 name: flight-app-config
             - secretRef:
-                name: flight-app-secrets
+                name: flight-app-secret
           resources:
             requests:
               cpu: 200m
@@ -41,17 +38,13 @@ spec:
               memory: 512Mi
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 8000
             initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+            periodSeconds: 5
