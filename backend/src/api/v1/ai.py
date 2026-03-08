@@ -1,7 +1,8 @@
+from collections import defaultdict
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from langchain_core.messages import HumanMessage, AIMessage
 from src.features.ai.agent import get_ai_agent
-from src.features.ai.tools import get_flight_market_data, get_demand_stats, search_destinations_by_description, predict_demand
 import json
 import logging
 
@@ -9,9 +10,13 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI Agent"])
 
+# Simple in-memory chat history (per-session, resets on restart)
+chat_histories: dict[str, list] = defaultdict(list)
+
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: str = "default"
 
 
 class PriceSuggestionRequest(BaseModel):
@@ -23,35 +28,30 @@ class DemandPredictionRequest(BaseModel):
 
 
 def run_agent(user_input: str) -> str:
-    llm = get_ai_agent()
-
-    # RAG: buscar destinos semanticamente relevantes
-    semantic_results = search_destinations_by_description.invoke({"query": user_input})
-
-    # Datos existentes
-    market_data = get_flight_market_data.invoke({"destination_name": user_input})
-    demand_data = get_demand_stats.invoke({})
-
-    prompt = (
-        f"Eres un asistente de vuelos inteligente. Responde en espanol.\n\n"
-        f"Destinos relevantes (busqueda semantica): {semantic_results}\n"
-        f"Datos del mercado: {market_data}\n"
-        f"Estadisticas de demanda: {demand_data}\n\n"
-        f"Pregunta del usuario: {user_input}\n\n"
-        f"Responde de forma clara y concisa basandote en los datos disponibles. "
-        f"Si hay destinos similares, mencionalos como sugerencias."
-    )
-
-    response = llm.invoke(prompt)
-    return response.content
+    agent = get_ai_agent()
+    result = agent.invoke({"input": user_input})
+    return result["output"]
 
 
 @router.post("/chat")
 async def chat_with_agent(request: ChatRequest):
     """Chatbot general que responde sobre vuelos, impuestos y mascotas."""
     try:
-        response = run_agent(request.message)
-        return {"response": response}
+        agent = get_ai_agent()
+        history = chat_histories[request.session_id]
+
+        result = agent.invoke({
+            "input": request.message,
+            "chat_history": history,
+        })
+
+        # Save to history (keep last 20 messages)
+        history.append(HumanMessage(content=request.message))
+        history.append(AIMessage(content=result["output"]))
+        if len(history) > 20:
+            chat_histories[request.session_id] = history[-20:]
+
+        return {"response": result["output"]}
     except Exception:
         logger.exception("AI chat error")
         raise HTTPException(status_code=500, detail="Error procesando solicitud de IA")
@@ -60,22 +60,16 @@ async def chat_with_agent(request: ChatRequest):
 @router.post("/suggest-price")
 async def suggest_price(request: PriceSuggestionRequest):
     """Agente especializado en sugerir ajustes de precios basados en demanda."""
-    llm = get_ai_agent()
-
-    market_data = get_flight_market_data.invoke({"destination_name": request.destination_name})
-    demand_data = get_demand_stats.invoke({})
-
-    prompt = (
-        f"Eres un analista de precios de vuelos. Responde en espanol.\n\n"
-        f"Datos del destino {request.destination_name}: {market_data}\n"
-        f"Estadisticas de demanda: {demand_data}\n\n"
-        f"Sugiere si debemos aumentar o disminuir el precio base o los impuestos "
-        f"basandote en la popularidad actual. Da recomendaciones concretas con numeros."
-    )
-
     try:
-        response = llm.invoke(prompt)
-        return {"suggestion": response.content}
+        agent = get_ai_agent()
+        prompt = (
+            f"Analiza el destino '{request.destination_name}'. "
+            f"Consulta los datos del mercado y estadisticas de demanda. "
+            f"Sugiere si debemos aumentar o disminuir el precio base o los impuestos "
+            f"basandote en la popularidad actual. Da recomendaciones concretas con numeros."
+        )
+        result = agent.invoke({"input": prompt})
+        return {"suggestion": result["output"]}
     except Exception:
         logger.exception("AI suggest-price error")
         raise HTTPException(status_code=500, detail="Error procesando sugerencia de precio")
@@ -84,22 +78,16 @@ async def suggest_price(request: PriceSuggestionRequest):
 @router.post("/predict-demand")
 async def predict_demand_endpoint(request: DemandPredictionRequest):
     """Predice la demanda futura de un destino basandose en datos historicos."""
-    llm = get_ai_agent()
-
-    prediction_data = predict_demand.invoke({"destination_name": request.destination_name})
-    market_data = get_flight_market_data.invoke({"destination_name": request.destination_name})
-
-    prompt = (
-        f"Eres un analista de demanda de vuelos. Responde en espanol.\n\n"
-        f"Prediccion de demanda: {prediction_data}\n"
-        f"Datos del mercado: {market_data}\n\n"
-        f"Analiza estos datos y da una prediccion detallada sobre la demanda futura del destino "
-        f"'{request.destination_name}'. Incluye recomendaciones de precios y capacidad."
-    )
-
     try:
-        response = llm.invoke(prompt)
-        return {"prediction": response.content, "data": json.loads(prediction_data)}
+        agent = get_ai_agent()
+        prompt = (
+            f"Analiza la demanda del destino '{request.destination_name}'. "
+            f"Consulta los datos del mercado y estadisticas de demanda. "
+            f"Da una prediccion detallada sobre la demanda futura, "
+            f"incluyendo recomendaciones de precios y capacidad."
+        )
+        result = agent.invoke({"input": prompt})
+        return {"prediction": result["output"]}
     except Exception:
         logger.exception("AI predict-demand error")
         raise HTTPException(status_code=500, detail="Error procesando prediccion de demanda")
