@@ -206,6 +206,35 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  grafana:
+    container_name: flight-grafana
+    image: grafana/grafana:10.3.1
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frontend:
     container_name: flight-frontend
     build:
@@ -240,6 +269,8 @@ volumes:
     name: flight-rabbitmq-data
   prometheus-data:
     name: flight-prometheus-data
+  grafana-data:
+    name: flight-grafana-data
 
 networks:
   backend:
