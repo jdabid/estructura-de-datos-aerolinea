@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
+from src.worker.tasks import send_promotion_alert
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,6 +20,17 @@ def create_destination(db: Session, destination: schemas.DestinationCreate):
         store_destination_embedding(db_dest.id, description)
     except Exception:
         logger.warning("No se pudo generar embedding para destino %s", db_dest.id)
+
+    if db_dest.is_promotion:
+        try:
+            promotion_payload = {
+                "name": db_dest.name,
+                "tax_amount": float(db_dest.tax_amount),
+                "is_promotion": db_dest.is_promotion,
+            }
+            send_promotion_alert.delay(json.dumps(promotion_payload))
+        except Exception:
+            logger.exception("Failed to dispatch promotion alert for destination %s", db_dest.id)
 
     return db_dest
 

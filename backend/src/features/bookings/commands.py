@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from src.features.flights.models import Flight
 from src.shared.exceptions import NotFoundException, ValidationException
-from src.worker.tasks import process_booking_event
+from src.worker.tasks import process_booking_event, send_booking_confirmation
 import json
 import logging
 
@@ -49,5 +49,16 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
         process_booking_event.delay(json.dumps(payload))
     except Exception:
         logger.exception("Failed to dispatch booking event for booking %s", db_booking.id)
+
+    try:
+        confirmation_payload = {
+            "id": db_booking.id,
+            "passenger_name": db_booking.passenger_name,
+            "flight_number": flight.flight_number,
+            "total_price": float(db_booking.total_price),
+        }
+        send_booking_confirmation.delay(json.dumps(confirmation_payload))
+    except Exception:
+        logger.exception("Failed to dispatch booking confirmation for booking %s", db_booking.id)
 
     return db_booking

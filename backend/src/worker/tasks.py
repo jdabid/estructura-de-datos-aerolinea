@@ -62,3 +62,64 @@ def process_booking_event(self, booking_data: str):
             )
             return f"Reserva enviada a dead letter queue tras {self.max_retries} reintentos"
         raise self.retry(exc=exc)
+
+
+@celery_app.task(name="send_booking_confirmation", bind=True, max_retries=3, default_retry_delay=5)
+def send_booking_confirmation(self, booking_data: str):
+    """Simula envio de confirmacion de reserva por email."""
+    try:
+        data = json.loads(booking_data)
+        confirmation = {
+            "type": "booking_confirmation",
+            "passenger": data["passenger_name"],
+            "flight": data.get("flight_number", "N/A"),
+            "total": data["total_price"],
+            "timestamp": str(datetime.utcnow()),
+        }
+        log_to_list("logs:notifications", json.dumps(confirmation))
+        update_stat("stats:notifications_sent", 1)
+        logger.info(f"Confirmacion enviada a {data['passenger_name']}")
+        return f"Confirmacion enviada para reserva {data['id']}"
+    except Exception as exc:
+        logger.exception("Error sending booking confirmation")
+        raise self.retry(exc=exc)
+
+
+@celery_app.task(name="send_promotion_alert", bind=True, max_retries=3, default_retry_delay=5)
+def send_promotion_alert(self, destination_data: str):
+    """Notifica cuando un destino entra en promocion."""
+    try:
+        data = json.loads(destination_data)
+        alert = {
+            "type": "promotion_alert",
+            "destination": data["name"],
+            "discount": "10%",
+            "timestamp": str(datetime.utcnow()),
+        }
+        log_to_list("logs:notifications", json.dumps(alert))
+        update_stat("stats:promotion_alerts_sent", 1)
+        logger.info(f"Alerta de promocion para {data['name']}")
+        return f"Alerta de promocion enviada para {data['name']}"
+    except Exception as exc:
+        logger.exception("Error sending promotion alert")
+        raise self.retry(exc=exc)
+
+
+@celery_app.task(name="send_pet_rejection_notice", bind=True, max_retries=2, default_retry_delay=5)
+def send_pet_rejection_notice(self, passenger_name: str, destination_name: str):
+    """Notifica cuando una reserva con mascota es rechazada."""
+    try:
+        notice = {
+            "type": "pet_rejection",
+            "passenger": passenger_name,
+            "destination": destination_name,
+            "reason": "El destino no permite mascotas",
+            "timestamp": str(datetime.utcnow()),
+        }
+        log_to_list("logs:notifications", json.dumps(notice))
+        update_stat("stats:pet_rejections_notified", 1)
+        logger.info(f"Notificacion de rechazo de mascota para {passenger_name}")
+        return f"Notificacion de rechazo enviada a {passenger_name}"
+    except Exception as exc:
+        logger.exception("Error sending pet rejection notice")
+        raise self.retry(exc=exc)
