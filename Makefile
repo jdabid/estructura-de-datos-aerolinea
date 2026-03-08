@@ -1,4 +1,4 @@
-.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security flower grafana fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint kustomize-build-dev kustomize-build-staging kustomize-build-prod kustomize-validate kustomize-diff
+.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security flower grafana jaeger fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint kustomize-build-dev kustomize-build-staging kustomize-build-prod kustomize-validate kustomize-diff
 
 help: ## Mostrar ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -55,6 +55,10 @@ flower: ## Open Flower dashboard
 grafana: ## Open Grafana dashboard
 	@echo "Grafana: http://localhost:3001 (admin/admin123)"
 	@open http://localhost:3001 2>/dev/null || echo "Open http://localhost:3001 in browser"
+
+jaeger: ## Open Jaeger UI
+	@echo "Jaeger: http://localhost:16686"
+	@open http://localhost:16686 2>/dev/null || echo "Open http://localhost:16686 in browser"
 
 # === Frontend ===
 fe-install: ## Instalar dependencias frontend

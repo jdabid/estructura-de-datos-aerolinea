@@ -19,6 +19,8 @@ services:
       - REDIS_HOST=redis
       - GROQ_API_KEY=${GROQ_API_KEY}
       - JWT_SECRET_KEY=super-secret-jwt-key-change-in-production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=flight-api
     depends_on:
       db:
         condition: service_healthy
@@ -55,6 +57,8 @@ services:
       - DATABASE_URL=postgresql://user:pass@db:5432/flights
       - RABBITMQ_URL=pyamqp://admin:admin123@rabbitmq:5672//
       - REDIS_HOST=redis
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=flight-worker
     depends_on:
       redis:
         condition: service_healthy
@@ -223,6 +227,28 @@ services:
       - prometheus
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  jaeger:
+    container_name: flight-jaeger
+    image: jaegertracing/all-in-one:1.54
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686"]
       interval: 15s
       timeout: 5s
       retries: 3

@@ -4,6 +4,8 @@ from src.api.v1 import flights, bookings, ai, auth, stats
 from src.shared.exceptions import AppException, app_exception_handler
 from src.shared.middleware import RateLimitMiddleware
 from src.shared.metrics import setup_metrics
+from src.shared.tracing import setup_tracing
+from src.shared.database import engine
 from src.features.bookings.event_log import BookingEvent  # noqa: F401
 
 # Las tablas se gestionan con Alembic (ver alembic/ para migraciones)
@@ -24,6 +26,9 @@ app.add_middleware(
 
 # Rate limiting: 60 requests por minuto por IP
 app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
+
+# OpenTelemetry tracing
+setup_tracing(app, engine=engine)
 
 app.include_router(flights.router, prefix="/api/v1")
 app.include_router(bookings.router, prefix="/api/v1")
