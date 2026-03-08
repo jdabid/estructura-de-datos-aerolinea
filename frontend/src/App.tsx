@@ -7,6 +7,7 @@ import FlightsPage from './pages/FlightsPage';
 import CreateFlightPage from './pages/CreateFlightPage';
 import BookingPage from './pages/BookingPage';
 import BookingsPage from './pages/BookingsPage';
+import StatsPage from './pages/StatsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/create-flight" element={<CreateFlightPage />} />
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
+          <Route path="/stats" element={<StatsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
