@@ -2,8 +2,26 @@ from .celery_app import celery_app
 from src.shared.redis_client import update_stat, log_to_list
 import json
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
+
+@celery_app.task(name="handle_dead_letter", bind=True)
+def handle_dead_letter(self, original_task_name: str, original_args: str, error_message: str):
+    """Procesa mensajes que fallaron despues de todos los reintentos."""
+    log_to_list(
+        "logs:dead_letter",
+        json.dumps({
+            "task": original_task_name,
+            "args": original_args,
+            "error": error_message,
+            "timestamp": str(datetime.utcnow()),
+        }),
+    )
+    update_stat("stats:dead_letter_count", 1)
+    logger.error(f"Dead letter: {original_task_name} - {error_message}")
+    return f"Dead letter registrada para {original_task_name}"
 
 
 @celery_app.task(
@@ -36,4 +54,11 @@ def process_booking_event(self, booking_data: str):
         return f"Procesada reserva {data['id']} exitosamente"
     except Exception as exc:
         logger.exception("Error processing booking event")
+        if self.request.retries >= self.max_retries:
+            handle_dead_letter.delay(
+                "process_booking_event",
+                booking_data,
+                str(exc),
+            )
+            return f"Reserva enviada a dead letter queue tras {self.max_retries} reintentos"
         raise self.retry(exc=exc)
