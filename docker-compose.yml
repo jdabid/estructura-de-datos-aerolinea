@@ -77,7 +77,7 @@ services:
 
   db:
     container_name: flight-db
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -86,6 +86,7 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./infra/docker/init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql
     healthcheck:
       test: pg_isready -U user -d flights
       interval: 10s
