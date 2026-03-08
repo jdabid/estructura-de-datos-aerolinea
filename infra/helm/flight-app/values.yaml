@@ -55,3 +55,20 @@ healthcheck:
 prometheus:
   scrape: true
   port: 8000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  hosts:
+    - host: flights.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: flights-tls
+      hosts:
+        - flights.example.com
