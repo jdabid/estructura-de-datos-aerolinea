@@ -72,3 +72,6 @@ ingress:
     - secretName: flights-tls
       hosts:
         - flights.example.com
+
+networkPolicy:
+  enabled: false
