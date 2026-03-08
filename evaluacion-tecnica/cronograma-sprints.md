@@ -10,19 +10,19 @@
 | Metrica | Valor |
 |---------|-------|
 | Total User Stories | 53 |
-| Completadas | 37 |
+| Completadas | 45 |
 | En progreso | 0 |
-| Pendientes | 16 |
+| Pendientes | 8 |
 | Story Points totales | 229 |
-| Story Points completados | 164 |
-| Story Points restantes | 65 |
-| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3), 32 SP (Sprint 4), 33 SP (Sprint 5) |
-| Sprint actual | Sprint 5 COMPLETADO |
+| Story Points completados | 196 |
+| Story Points restantes | 33 |
+| Velocidad actual | 32 SP (Sprint 1), 33 SP (Sprint 2), 34 SP (Sprint 3), 32 SP (Sprint 4), 33 SP (Sprint 5), 32 SP (Sprint 6) |
+| Sprint actual | Sprint 6 COMPLETADO |
 
 ### Progreso Global
 
 ```
-Completado: [############################______________] 72%  (164/229 SP)
+Completado: [##################################________] 86%  (196/229 SP)
 ```
 
 ---
@@ -196,23 +196,35 @@ Sprint 5: [######################################] 100%  (33/33 SP)
 
 **Sprint Goal:** Robustecer el procesamiento asincrono y agregar observabilidad completa.
 **Duracion:** Semana 11-12
-**Estado:** NO INICIADO
-**SP Completados:** 0/32
+**Estado:** COMPLETADO
+**SP Completados:** 32/32
 
 ```
-Sprint 6: [______________________________________] 0%  (0/32 SP)
+Sprint 6: [######################################] 100%  (32/32 SP)
 ```
 
 | ID | User Story | SP | Estado | Branch | PR | Fecha |
 |----|------------|----|---------|---------|----|-------|
-| US-38 | Dead letter queue | 3 | PENDIENTE | — | — | — |
-| US-39 | Flower para monitorear Celery | 3 | PENDIENTE | — | — | — |
-| US-40 | Nuevas tasks de notificaciones | 5 | PENDIENTE | — | — | — |
-| US-41 | Event log de reservas | 3 | PENDIENTE | — | — | — |
-| US-42 | Metricas de Prometheus | 5 | PENDIENTE | — | — | — |
-| US-43 | Dashboards de Grafana | 5 | PENDIENTE | — | — | — |
-| US-44 | Tracing con OpenTelemetry | 5 | PENDIENTE | — | — | — |
-| US-45 | Logging JSON con correlation IDs | 3 | PENDIENTE | — | — | — |
+| US-38 | Dead letter queue | 3 | DONE | `feature/s6-US38-dead-letter-queue` | [#49](https://github.com/jdabid/flight-reservation-system/pull/49) | 2026-03-07 |
+| US-39 | Flower para monitorear Celery | 3 | DONE | `feature/s6-US39-flower-monitoring` | [#50](https://github.com/jdabid/flight-reservation-system/pull/50) | 2026-03-07 |
+| US-40 | Nuevas tasks de notificaciones | 5 | DONE | `feature/s6-US40-notification-tasks` | [#51](https://github.com/jdabid/flight-reservation-system/pull/51) | 2026-03-07 |
+| US-41 | Event log de reservas | 3 | DONE | `feature/s6-US41-event-log` | [#52](https://github.com/jdabid/flight-reservation-system/pull/52) | 2026-03-07 |
+| US-42 | Metricas de Prometheus | 5 | DONE | `feature/s6-US42-prometheus-metrics` | [#53](https://github.com/jdabid/flight-reservation-system/pull/53) | 2026-03-07 |
+| US-43 | Dashboards de Grafana | 5 | DONE | `feature/s6-US43-grafana-dashboards` | [#54](https://github.com/jdabid/flight-reservation-system/pull/54) | 2026-03-07 |
+| US-44 | Tracing con OpenTelemetry | 5 | DONE | `feature/s6-US44-opentelemetry-tracing` | [#55](https://github.com/jdabid/flight-reservation-system/pull/55) | 2026-03-07 |
+| US-45 | Logging JSON con correlation IDs | 3 | DONE | `feature/s6-US45-json-logging` | [#56](https://github.com/jdabid/flight-reservation-system/pull/56) | 2026-03-07 |
+
+### Notas del Sprint 6
+- Batch 1 (US-38 a US-41): 4 agentes en paralelo con worktree isolation
+- Batch 2 (US-42 a US-45): 4 agentes en paralelo con worktree isolation
+- US-40 conflicto en stats.py con US-38 (REC-01): mantener ambos endpoints
+- US-41 conflicto en commands.py con US-40 (REC-01): mantener ambas dispatches
+- US-43 conflicto en docker-compose.yml con US-42 (REC-01): mantener prometheus y grafana
+- US-44 conflicto en 4 archivos (requirements.txt, main.py, docker-compose.yml, Makefile): agregar OTel + Jaeger
+- US-45 conflicto en 3 archivos: agregar logging JSON + correlation IDs
+- Worktrees anidados recurrentes (ERR-S4-03): batch 2 dentro de worktree residual de US-41
+- Observabilidad completa: Prometheus + Grafana + Jaeger + JSON logging con correlation IDs
+- Sprint 6 completado: 32/32 SP
 
 ---
 
@@ -263,13 +275,9 @@ Restantes
       |
    98 |                    *
       |
-   65 |                          *  ← actual (Sprint 5 completado)
+   65 |                          *
       |
-  100 |
-      |
-   75 |
-      |
-   50 |
+   33 |                                *  ← actual (Sprint 6 completado)
       |
    25 |
       |
@@ -320,3 +328,11 @@ Restantes
 | 2026-03-07 | US-35 | COMPLETADA | 5 | Agent (worktree isolation), LangChain RAG |
 | 2026-03-07 | US-36 | COMPLETADA | 5 | Agent (worktree isolation), Redis stats, LangChain |
 | 2026-03-07 | US-37 | COMPLETADA | 5 | Agent (worktree isolation), LangChain AgentExecutor |
+| 2026-03-07 | US-38 | COMPLETADA | 3 | Agent (worktree isolation), Celery DLQ |
+| 2026-03-07 | US-39 | COMPLETADA | 3 | Agent (worktree isolation), Flower |
+| 2026-03-07 | US-40 | COMPLETADA | 5 | Agent (worktree isolation), Celery tasks |
+| 2026-03-07 | US-41 | COMPLETADA | 3 | Agent (worktree isolation), SQLAlchemy event log |
+| 2026-03-07 | US-42 | COMPLETADA | 5 | Agent (worktree isolation), Prometheus |
+| 2026-03-07 | US-43 | COMPLETADA | 5 | Agent (worktree isolation), Grafana dashboards |
+| 2026-03-07 | US-44 | COMPLETADA | 5 | Agent (worktree isolation), OpenTelemetry, Jaeger |
+| 2026-03-07 | US-45 | COMPLETADA | 3 | Agent (worktree isolation), python-json-logger |
