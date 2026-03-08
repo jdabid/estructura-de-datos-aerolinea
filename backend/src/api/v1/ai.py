@@ -68,3 +68,27 @@ async def suggest_price(request: PriceSuggestionRequest):
     except Exception:
         logger.exception("AI suggest-price error")
         raise HTTPException(status_code=500, detail="Error procesando sugerencia de precio")
+
+
+@router.post("/embed-destination")
+async def embed_destination(destination_id: int, description: str):
+    """Genera y almacena el embedding de un destino."""
+    from src.shared.embeddings import store_destination_embedding
+    try:
+        store_destination_embedding(destination_id, description)
+        return {"status": "ok", "message": f"Embedding almacenado para destino {destination_id}"}
+    except Exception:
+        logger.exception("Error storing embedding")
+        raise HTTPException(status_code=500, detail="Error almacenando embedding")
+
+
+@router.get("/search-destinations")
+async def search_destinations(query: str, limit: int = 5):
+    """Busca destinos similares usando busqueda semantica con pgvector."""
+    from src.shared.embeddings import search_similar_destinations
+    try:
+        results = search_similar_destinations(query, limit)
+        return {"results": results}
+    except Exception:
+        logger.exception("Error searching destinations")
+        raise HTTPException(status_code=500, detail="Error buscando destinos similares")

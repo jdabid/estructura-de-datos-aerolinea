@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, Text
 from sqlalchemy.orm import relationship
+from pgvector.sqlalchemy import Vector
 from src.shared.database import Base
 
 
@@ -11,6 +12,8 @@ class Destination(Base):
     tax_amount = Column(Float, default=0.0)
     is_promotion = Column(Boolean, default=False)
     allows_pets = Column(Boolean, default=True)
+    description = Column(Text, nullable=True)
+    embedding = Column(Vector(384), nullable=True)
 
     flights = relationship("Flight", back_populates="destination")
 
