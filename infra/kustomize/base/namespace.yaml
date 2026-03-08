@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flight-system
+  labels:
+    app.kubernetes.io/name: flight-app
