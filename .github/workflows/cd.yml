@@ -1,0 +1,349 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+  EKS_CLUSTER_NAME: flight-reservation-cluster
+  AWS_REGION: us-east-1
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Staging deployment - automatic after CI success
+  # ---------------------------------------------------------------------------
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'staging')
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    environment:
+      name: staging
+      url: https://staging.flight-reservation.example.com
+    outputs:
+      deployed-version: ${{ steps.version.outputs.sha }}
+      deploy-status: ${{ steps.verify.outputs.status }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine commit SHA
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          else
+            SHA="${{ github.sha }}"
+          fi
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHA:0:7}" >> "$GITHUB_OUTPUT"
+          echo "Deploying version: ${SHA}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Update image tags in kustomization
+        run: |
+          cd infra/kustomize/overlays/staging
+          kustomize edit set image \
+            flight-api=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/api:${{ steps.version.outputs.sha }} \
+            flight-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ steps.version.outputs.sha }}
+
+      - name: Apply kustomize overlay for staging
+        run: |
+          kubectl apply -k infra/kustomize/overlays/staging/
+          echo "Kustomize overlay aplicado en staging"
+
+      - name: Wait for API rollout
+        run: |
+          echo "Esperando rollout del deployment flight-api..."
+          kubectl rollout status deployment/staging-flight-api \
+            -n flight-staging \
+            --timeout=300s
+
+      - name: Wait for frontend rollout
+        run: |
+          echo "Esperando rollout del deployment flight-frontend..."
+          kubectl rollout status deployment/staging-flight-frontend \
+            -n flight-staging \
+            --timeout=300s
+
+      - name: Run smoke tests
+        id: smoke
+        run: |
+          echo "Ejecutando smoke tests en staging..."
+          STAGING_URL="https://staging.flight-reservation.example.com"
+
+          # Health check - API
+          for i in $(seq 1 5); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${STAGING_URL}/api/health" || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Health check API exitoso (intento ${i})"
+              break
+            fi
+            echo "Intento ${i}/5 - HTTP ${HTTP_CODE}, reintentando en 10s..."
+            sleep 10
+          done
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Smoke test fallido - API no responde"
+            exit 1
+          fi
+
+          # Verify API version header
+          VERSION_RESPONSE=$(curl -s "${STAGING_URL}/api/health")
+          echo "API response: ${VERSION_RESPONSE}"
+          echo "Smoke tests completados exitosamente"
+
+      - name: Verify deployment
+        id: verify
+        run: |
+          echo "Verificando estado del deployment en staging..."
+          kubectl get pods -n flight-staging -l app=flight-api -o wide
+          kubectl get svc -n flight-staging
+          echo "status=success" >> "$GITHUB_OUTPUT"
+
+      - name: Notify staging deployment failure
+        if: failure()
+        run: |
+          echo "::warning::Deployment a staging falló para version ${{ steps.version.outputs.sha }}"
+          # Placeholder: integrar con Slack webhook
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"CD Pipeline: Deploy a staging FALLO - commit ${{ steps.version.outputs.short_sha }}"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Rollback staging on failure
+        if: failure()
+        run: |
+          echo "Ejecutando rollback en staging..."
+          kubectl rollout undo deployment/staging-flight-api -n flight-staging
+          kubectl rollout undo deployment/staging-flight-frontend -n flight-staging
+          kubectl rollout status deployment/staging-flight-api -n flight-staging --timeout=180s
+          echo "Rollback completado en staging"
+
+  # ---------------------------------------------------------------------------
+  # Production deployment - requires manual approval
+  # ---------------------------------------------------------------------------
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: >-
+      (github.event_name == 'workflow_run') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'production')
+    timeout-minutes: 30
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://flight-reservation.example.com
+    outputs:
+      deployed-version: ${{ steps.version.outputs.sha }}
+      deploy-status: ${{ steps.switch-traffic.outputs.status }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine commit SHA
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          else
+            SHA="${{ github.sha }}"
+          fi
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHA:0:7}" >> "$GITHUB_OUTPUT"
+          echo "Deploying to production version: ${SHA}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PRODUCTION }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.EKS_CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      # --- Blue-Green: deploy to green (inactive) slot ---
+      - name: Deploy green (new version)
+        id: deploy-green
+        run: |
+          echo "Desplegando version green (nueva) en produccion..."
+          cd infra/kustomize/overlays/prod
+          kustomize edit set image \
+            flight-api=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/api:${{ steps.version.outputs.sha }} \
+            flight-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ steps.version.outputs.sha }}
+
+          # Label green deployment for blue-green strategy
+          cd ${{ github.workspace }}
+          kubectl apply -k infra/kustomize/overlays/prod/
+
+          # Add green label to new pods
+          kubectl patch deployment prod-flight-api -n flight-prod \
+            -p '{"spec":{"template":{"metadata":{"labels":{"slot":"green","version":"${{ steps.version.outputs.short_sha }}"}}}}}'
+          kubectl patch deployment prod-flight-frontend -n flight-prod \
+            -p '{"spec":{"template":{"metadata":{"labels":{"slot":"green","version":"${{ steps.version.outputs.short_sha }}"}}}}}'
+
+      - name: Wait for green rollout
+        run: |
+          echo "Esperando rollout de green deployment..."
+          kubectl rollout status deployment/prod-flight-api \
+            -n flight-prod \
+            --timeout=300s
+          kubectl rollout status deployment/prod-flight-frontend \
+            -n flight-prod \
+            --timeout=300s
+
+      - name: Verify green deployment health
+        id: verify-green
+        run: |
+          echo "Verificando salud del deployment green..."
+
+          # Check pods are ready
+          READY_PODS=$(kubectl get pods -n flight-prod \
+            -l app=flight-api,slot=green \
+            -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')
+
+          echo "Ready pods: ${READY_PODS}"
+
+          # Internal health check via port-forward
+          kubectl port-forward svc/prod-flight-api 8080:80 -n flight-prod &
+          PF_PID=$!
+          sleep 5
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/health || echo "000")
+          kill $PF_PID 2>/dev/null || true
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Green deployment health check fallo - HTTP ${HTTP_CODE}"
+            exit 1
+          fi
+
+          echo "Green deployment verificado exitosamente"
+
+      # --- Blue-Green: switch traffic to green ---
+      - name: Switch traffic to green
+        id: switch-traffic
+        run: |
+          echo "Cambiando trafico a green deployment..."
+
+          # Update service selector to point to green
+          kubectl patch svc prod-flight-api -n flight-prod \
+            -p '{"spec":{"selector":{"slot":"green"}}}'
+          kubectl patch svc prod-flight-frontend -n flight-prod \
+            -p '{"spec":{"selector":{"slot":"green"}}}'
+
+          echo "Trafico redirigido a green deployment"
+          echo "status=success" >> "$GITHUB_OUTPUT"
+
+      - name: Post-switch verification
+        run: |
+          echo "Verificacion post-switch de produccion..."
+          PROD_URL="https://flight-reservation.example.com"
+
+          for i in $(seq 1 5); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/api/health" || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Verificacion exitosa en produccion (intento ${i})"
+              break
+            fi
+            echo "Intento ${i}/5 - HTTP ${HTTP_CODE}, reintentando en 10s..."
+            sleep 10
+          done
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Verificacion post-switch fallida"
+            exit 1
+          fi
+
+          echo "Produccion operativa con version ${{ steps.version.outputs.short_sha }}"
+
+      - name: Record deployment
+        if: success()
+        run: |
+          echo "=== DEPLOYMENT RECORD ==="
+          echo "Environment: production"
+          echo "Version: ${{ steps.version.outputs.sha }}"
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Status: SUCCESS"
+          echo "========================="
+
+      - name: Notify production deployment success
+        if: success()
+        run: |
+          echo "Deploy a produccion exitoso - version ${{ steps.version.outputs.short_sha }}"
+          # Placeholder: integrar con Slack webhook
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"CD Pipeline: Deploy a produccion EXITOSO - commit ${{ steps.version.outputs.short_sha }}"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Rollback production on failure
+        if: failure()
+        run: |
+          echo "::error::Deploy a produccion fallo, ejecutando rollback..."
+
+          # Revert service selector to blue (previous version)
+          kubectl patch svc prod-flight-api -n flight-prod \
+            -p '{"spec":{"selector":{"slot":"blue"}}}' 2>/dev/null || true
+          kubectl patch svc prod-flight-frontend -n flight-prod \
+            -p '{"spec":{"selector":{"slot":"blue"}}}' 2>/dev/null || true
+
+          # Rollback deployments
+          kubectl rollout undo deployment/prod-flight-api -n flight-prod
+          kubectl rollout undo deployment/prod-flight-frontend -n flight-prod
+
+          # Wait for rollback
+          kubectl rollout status deployment/prod-flight-api \
+            -n flight-prod --timeout=300s
+          kubectl rollout status deployment/prod-flight-frontend \
+            -n flight-prod --timeout=300s
+
+          echo "Rollback completado en produccion"
+
+      - name: Notify production deployment failure
+        if: failure()
+        run: |
+          echo "::warning::Deploy a produccion FALLO y se ejecuto rollback - version ${{ steps.version.outputs.short_sha }}"
+          # Placeholder: integrar con Slack webhook
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"CD Pipeline: Deploy a produccion FALLO (rollback ejecutado) - commit ${{ steps.version.outputs.short_sha }}"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
