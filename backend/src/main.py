@@ -6,7 +6,12 @@ from src.shared.middleware import RateLimitMiddleware
 from src.shared.metrics import setup_metrics
 from src.shared.tracing import setup_tracing
 from src.shared.database import engine
+from src.shared.logging_config import setup_logging
+from src.shared.correlation_middleware import CorrelationIdMiddleware
 from src.features.bookings.event_log import BookingEvent  # noqa: F401
+
+# Configurar logging estructurado antes de crear la app
+setup_logging()
 
 # Las tablas se gestionan con Alembic (ver alembic/ para migraciones)
 # Para aplicar: alembic upgrade head
@@ -29,6 +34,9 @@ app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
 
 # OpenTelemetry tracing
 setup_tracing(app, engine=engine)
+
+# Correlation ID middleware para tracking de requests
+app.add_middleware(CorrelationIdMiddleware)
 
 app.include_router(flights.router, prefix="/api/v1")
 app.include_router(bookings.router, prefix="/api/v1")
