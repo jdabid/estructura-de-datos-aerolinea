@@ -1,0 +1,84 @@
+.PHONY: help up down dev logs logs-api logs-worker ps restart clean test test-cov lint format security fe-install fe-build fe-dev fe-lint db-shell migrate migrate-gen helm-install helm-uninstall helm-template helm-lint
+
+help: ## Mostrar ayuda
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+# === Docker ===
+up: ## Levantar todos los servicios
+	docker compose up --build -d
+
+down: ## Detener todos los servicios
+	docker compose down
+
+dev: ## Levantar en modo desarrollo con hot-reload
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+logs: ## Ver logs de todos los servicios
+	docker compose logs -f
+
+logs-api: ## Ver logs del API
+	docker compose logs -f api
+
+logs-worker: ## Ver logs del worker
+	docker compose logs -f worker
+
+ps: ## Ver estado de servicios
+	docker compose ps
+
+restart: ## Reiniciar todos los servicios
+	docker compose restart
+
+clean: ## Detener y eliminar volumenes
+	docker compose down -v
+
+# === Backend ===
+test: ## Ejecutar tests
+	docker compose exec api pytest tests/ -v --tb=short
+
+test-cov: ## Ejecutar tests con coverage
+	docker compose exec api pytest tests/ -v --tb=short --cov=src --cov-report=html
+
+lint: ## Ejecutar linters (ruff + mypy)
+	cd backend && ruff check src/ && mypy src/
+
+format: ## Formatear codigo con ruff
+	cd backend && ruff format src/
+
+security: ## Ejecutar bandit
+	cd backend && bandit -r src/ -ll -ii
+
+# === Frontend ===
+fe-install: ## Instalar dependencias frontend
+	cd frontend && npm install
+
+fe-build: ## Build frontend
+	cd frontend && npm run build
+
+fe-dev: ## Dev server frontend (sin Docker)
+	cd frontend && npm run dev
+
+fe-lint: ## Lint frontend
+	cd frontend && npm run lint
+
+# === Database ===
+db-shell: ## Abrir shell PostgreSQL
+	docker compose exec db psql -U user -d flights
+
+migrate: ## Ejecutar migraciones Alembic
+	docker compose exec api alembic upgrade head
+
+migrate-gen: ## Generar nueva migracion
+	@read -p "Mensaje: " msg; docker compose exec api alembic revision --autogenerate -m "$$msg"
+
+# === Helm / K8s ===
+helm-install: ## Instalar/actualizar Helm chart
+	helm upgrade --install flight-system ./infra/helm/flight-app
+
+helm-uninstall: ## Desinstalar Helm chart
+	helm uninstall flight-system
+
+helm-template: ## Renderizar templates Helm
+	helm template flight-system ./infra/helm/flight-app
+
+helm-lint: ## Validar Helm chart
+	helm lint ./infra/helm/flight-app
